@@ -473,7 +473,7 @@ body[data-side="mini"] .sbadge{
    - Multimoneda: el dólar es la base y cada moneda lleva su tasa.
    - Planes y monedas los crea y edita el dueño del panel.
    ======================================================================= */
-var PC_VERSION = 'v2.0 · 20/11/2026';
+var PC_VERSION = 'v2.1 · 20/11/2026';
 var PC_KEY = 'panelClientes_v1';
 var PC_SUPA = 'pc_supa_cfg';
 var PC_SES  = 'pc_sesion';
@@ -541,15 +541,30 @@ function asegurarBase(){
    ===================================================================== */
 var NUBE={url:'',key:'',ses:null,listo:false,timer:null,subiendo:false,otra:false,estado:'',ultimo:null,err:'',prev:null};
 
+function limpiarUrl(u){
+  var x=String(u||'').trim();
+  x=x.replace(/\/+$/,'');
+  for(var i=0;i<4;i++){
+    if(/\/rest\/v1$/i.test(x)){ x=x.replace(/\/rest\/v1$/i,''); continue; }
+    if(/\/auth\/v1$/i.test(x)){ x=x.replace(/\/auth\/v1$/i,''); continue; }
+    if(/\/v1$/i.test(x) && /\/rest$/i.test(x.replace(/\/v1$/i,''))){ x=x.replace(/\/v1$/i,''); continue; }
+    break;
+  }
+  return x.replace(/\/+$/,'');
+}
+function limpiarClave(k){
+  var x=String(k||'').trim().replace(/^['"]+|['"]+$/g,'').replace(/\s+/g,'');
+  return x;
+}
 function supaCfgLeer(){
   try{
     var o=JSON.parse(localStorage.getItem(PC_SUPA)||'null');
-    if(o && o.url && o.key){ NUBE.url=String(o.url).replace(/\/+$/,''); NUBE.key=String(o.key); return true; }
+    if(o && o.url && o.key){ NUBE.url=limpiarUrl(o.url); NUBE.key=limpiarClave(o.key); return true; }
   }catch(e){}
   return false;
 }
 function supaCfgGuardar(url,key){
-  NUBE.url=String(url||'').replace(/\/+$/,''); NUBE.key=String(key||'');
+  NUBE.url=limpiarUrl(url); NUBE.key=limpiarClave(key);
   try{ localStorage.setItem(PC_SUPA, JSON.stringify({url:NUBE.url,key:NUBE.key})); }catch(e){}
 }
 function sesLeer(){
@@ -770,8 +785,10 @@ function guardarConexion(){
   var u=(document.getElementById('l-url')||{}).value||'';
   var k=(document.getElementById('l-key')||{}).value||'';
   u=String(u).trim(); k=String(k).trim();
+  u=limpiarUrl(u); k=limpiarClave(k);
   if(!/^https?:\/\//i.test(u)){ loginMsg('lg-msg1','La dirección debe empezar por https://'); return; }
-  if(k.length<40){ loginMsg('lg-msg1','Esa clave parece incompleta. Copia la clave pública (anon public) completa.'); return; }
+  if(!/\.supabase\.co$/i.test(u) && !/^https?:\/\/(127\.0\.0\.1|localhost)/i.test(u)){ loginMsg('lg-msg1','Esa no parece la dirección del proyecto. Debe terminar en .supabase.co (sin /rest/v1/ al final).'); return; }
+  if(k.length<30){ loginMsg('lg-msg1','Esa clave parece incompleta. Copia la clave pública completa (empieza con sb_publishable_ o con eyJ).'); return; }
   supaCfgGuardar(u,k);
   loginMsg('lg-msg1','');
   mostrarLogin('login');
