@@ -244,6 +244,47 @@ body[data-dens="compacta"] .kpi{padding:8px 10px 9px}
 body[data-dens="compacta"] .kpi .v{font-size:18px}
 body[data-dens="compacta"] .cli-d{margin-top:5px}
 
+
+/* ---------- entrada al panel (clave) ---------- */
+.login{position:fixed;inset:0;z-index:900;display:none;place-items:center;padding:18px;
+  background:radial-gradient(900px 600px at 15% 0%,rgba(79,124,255,.30),transparent 60%),
+             radial-gradient(700px 500px at 90% 100%,rgba(63,224,160,.18),transparent 60%),
+             linear-gradient(180deg,#070c22,#050814)}
+.login.on{display:grid}
+.login-card{width:100%;max-width:400px;border-radius:20px;padding:22px;
+  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.03));
+  border:1px solid var(--linea2);box-shadow:0 40px 90px -50px #000, inset 0 1px 0 rgba(255,255,255,.09);
+  backdrop-filter:blur(16px)}
+.login-brand{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.login-brand .logo{width:46px;height:46px;font-size:15px;border-radius:14px}
+.lg-t{font-size:16px;font-weight:900;color:#f2f7ff;letter-spacing:.2px}
+.lg-s{font-size:11px;color:#8fa1c2;margin-top:2px}
+.lg-h{font-size:12px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;color:#8ea6d6;margin:6px 0 10px}
+.login .field{margin-bottom:10px}
+.login .field label{display:block;font-size:11.5px;font-weight:800;color:#a9bad8;margin-bottom:5px}
+.login input,.login textarea{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:11px;
+  border:1px solid var(--linea2);background:rgba(4,8,22,.55);color:#eef5ff;font-family:inherit;font-size:14px}
+.login input:focus,.login textarea:focus{outline:none;border-color:var(--cian);box-shadow:0 0 0 3px rgba(79,124,255,.18)}
+.login textarea{resize:vertical;font-size:11px;font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.45}
+.lg-btn{width:100%;justify-content:center;margin-top:4px;min-height:44px;font-size:14px}
+.lg-msg{font-size:12px;color:#ffb0bd;margin-top:10px;min-height:15px;line-height:1.45}
+.lg-link{display:block;width:100%;margin-top:12px;background:none;border:0;color:#8fa9d8;font-size:11.5px;
+  text-decoration:underline;cursor:pointer;font-family:inherit}
+.lg-link:hover{color:#cfe0ff}
+.lg-foot{margin-top:14px;padding-top:11px;border-top:1px solid var(--linea);font-size:10.5px;color:#6f80a0;line-height:1.5}
+.lg-mini{font-size:10.5px;color:#8397b8;line-height:1.5;margin-top:-2px}
+
+/* aviso de nube en la cabecera */
+.cloud{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;padding:6px 10px;border-radius:9px;
+  border:1px solid var(--linea);background:rgba(255,255,255,.05);font-size:10.5px;font-weight:800;color:#b8c8e6;white-space:nowrap}
+.cloud.ok{color:#8ef0bf;border-color:rgba(63,224,160,.35);background:rgba(63,224,160,.10)}
+.cloud.warn{color:#ffd79a;border-color:rgba(255,193,94,.35);background:rgba(255,193,94,.10)}
+.cloud.bad{color:#ffb0bd;border-color:rgba(255,111,139,.40);background:rgba(255,111,139,.12)}
+.side-user{font-size:10.5px;color:#93a6c8;line-height:1.6;word-break:break-word;margin-bottom:6px}
+.side-user a{color:#9fc4ff;text-decoration:none;font-weight:800}
+.side-user a:hover{text-decoration:underline}
+@media(max-width:640px){.cloud{font-size:11px;padding:5px 8px;gap:4px}.cloud .h{display:none}}
+
 /* ---------- barra lateral futurista ---------- */
 .shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh;transition:grid-template-columns .22s ease}
 body[data-side="mini"] .shell{grid-template-columns:82px minmax(0,1fr)}
@@ -368,6 +409,7 @@ body[data-side="mini"] .sbadge{
     </div>
     <nav class="side-nav" id="h-tabs"></nav>
     <div class="side-foot">
+      <div class="side-user" id="h-user"></div>
       <div class="side-stat" id="h-stat"></div>
       <div class="side-ver" id="h-ver"></div>
     </div>
@@ -382,6 +424,7 @@ body[data-side="mini"] .sbadge{
           <div class="h1" id="h-page">Panel</div>
           <div class="sub" id="h-sub">Lo que cobraste y lo que falta por cobrar.</div>
         </div>
+        <span class="cloud" id="h-cloud" title="Estado de la nube">☁️ <b>Nube</b></span>
         <button class="side-mini" data-act="sideToggle" title="Ocultar el menú" aria-label="Ocultar menú">⟨</button>
       </div>
     </header>
@@ -392,6 +435,35 @@ body[data-side="mini"] .sbadge{
 </div>
 <div class="modal-bg" id="modal-bg" hidden><div class="modal" id="modal-box"></div></div>
 <div id="toast"></div>
+<div id="login" class="login">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="logo" id="lg-logo">PC</div>
+      <div><div class="lg-t">Panel de clientes</div><div class="lg-s">Tu centro de control privado</div></div>
+    </div>
+
+    <div id="lg-setup" hidden>
+      <div class="lg-h">Conectar con la nube</div>
+      <div class="field"><label>Dirección del proyecto</label><input id="l-url" placeholder="https://xxxxxxxx.supabase.co" autocomplete="off" spellcheck="false"></div>
+      <div class="field"><label>Clave pública (anon key)</label><textarea id="l-key" rows="4" placeholder="eyJhbGciOiJIUzI1NiIs..." spellcheck="false"></textarea></div>
+      <div class="lg-mini">Están en Supabase → Project Settings → API. La clave pública se puede usar aquí sin peligro; la clave secreta NO se usa nunca en el panel.</div>
+      <button class="b-primary lg-btn" type="button" data-act="lgConexion">Guardar conexión</button>
+      <div class="lg-msg" id="lg-msg1"></div>
+    </div>
+
+    <form id="lg-form" hidden>
+      <div class="lg-h">Entrar</div>
+      <div class="field"><label>Tu correo</label><input id="l-mail" type="email" autocomplete="username" placeholder="tucorreo@ejemplo.com"></div>
+      <div class="field"><label>Tu clave</label><input id="l-pass" type="password" autocomplete="current-password" placeholder="Tu clave del panel"></div>
+      <button class="b-primary lg-btn" type="submit" id="lg-entrar">Entrar al panel</button>
+      <div class="lg-msg" id="lg-msg2"></div>
+      <button type="button" class="lg-link" data-act="lgCambiar">Cambiar la conexión</button>
+    </form>
+
+    <div class="lg-foot">Solo el dueño del panel entra aquí. Los negocios que alquilan las apps no tienen acceso a esta pantalla.</div>
+  </div>
+</div>
+
 
 <script>
 /* =======================================================================
@@ -401,8 +473,11 @@ body[data-side="mini"] .sbadge{
    - Multimoneda: el dólar es la base y cada moneda lleva su tasa.
    - Planes y monedas los crea y edita el dueño del panel.
    ======================================================================= */
-var PC_VERSION = 'v1.4 · 20/11/2026';
+var PC_VERSION = 'v2.0 · 20/11/2026';
 var PC_KEY = 'panelClientes_v1';
+var PC_SUPA = 'pc_supa_cfg';
+var PC_SES  = 'pc_sesion';
+var PC_MIG  = 'pc_migrado';
 
 /* ---------- datos ---------- */
 function datosVacios(){
@@ -427,7 +502,7 @@ var D = null;
 function cargar(){
   try{
     var raw = localStorage.getItem(PC_KEY);
-    if(!raw){ D = datosVacios(); guardar(); return; }
+    if(!raw){ D = datosVacios(); guardarLocal(); return; }
     var o = JSON.parse(raw);
     D = datosVacios();
     if(o && typeof o==='object'){
@@ -440,8 +515,12 @@ function cargar(){
     asegurarBase();
   }catch(e){ D = datosVacios(); }
 }
-function guardar(){
+function guardarLocal(){
   try{ localStorage.setItem(PC_KEY, JSON.stringify(D)); }catch(e){}
+}
+function guardar(){
+  guardarLocal();
+  if(NUBE.listo) nubeEncolar();
 }
 function asegurarBase(){
   var tieneBase = false;
@@ -449,6 +528,287 @@ function asegurarBase(){
   if(!tieneBase){ if(!D.monedas.length) D.monedas.push({cod:'USD',nom:'Dólar',sim:'$',tasa:1,base:false}); D.monedas[0].base=true; D.monedas[0].tasa=1; }
   var b = D.monedas.filter(function(m){ return m.base; })[0];
   D.monedas.forEach(function(m){ if(m!==b){ m.tasa = Number(m.tasa)||0; } });
+}
+
+
+/* =====================================================================
+   NUBE · Supabase
+   - El panel entra con correo y clave (Supabase Auth).
+   - Los datos viven en las tablas pc_* y se copian aqui para trabajar.
+   - Si no hay internet, se sigue trabajando con la copia del equipo y
+     se sube cuando vuelve la conexion.
+   - Nunca se usa la clave secreta: solo la publica (anon key).
+   ===================================================================== */
+var NUBE={url:'',key:'',ses:null,listo:false,timer:null,subiendo:false,otra:false,estado:'',ultimo:null,err:'',prev:null};
+
+function supaCfgLeer(){
+  try{
+    var o=JSON.parse(localStorage.getItem(PC_SUPA)||'null');
+    if(o && o.url && o.key){ NUBE.url=String(o.url).replace(/\/+$/,''); NUBE.key=String(o.key); return true; }
+  }catch(e){}
+  return false;
+}
+function supaCfgGuardar(url,key){
+  NUBE.url=String(url||'').replace(/\/+$/,''); NUBE.key=String(key||'');
+  try{ localStorage.setItem(PC_SUPA, JSON.stringify({url:NUBE.url,key:NUBE.key})); }catch(e){}
+}
+function sesLeer(){
+  try{
+    var o=JSON.parse(localStorage.getItem(PC_SES)||'null');
+    if(o && o.access && (o.exp>Date.now() || o.refresh)){ NUBE.ses=o; return true; }
+  }catch(e){}
+  return false;
+}
+function sesGuardar(o){ NUBE.ses=o; try{ localStorage.setItem(PC_SES, JSON.stringify(o)); }catch(e){} }
+function sesBorrar(){ NUBE.ses=null; try{ localStorage.removeItem(PC_SES); }catch(e){} }
+
+async function authPedir(cuerpo){
+  var r=await fetch(NUBE.url+'/auth/v1/token?grant_type='+encodeURIComponent(cuerpo.grant_type),{
+    method:'POST', headers:{'apikey':NUBE.key,'Content-Type':'application/json'}, body:JSON.stringify(cuerpo)
+  });
+  var j={}; try{ j=await r.json(); }catch(e){}
+  if(!r.ok) throw new Error(j.error_description||j.msg||j.error||'No se pudo entrar');
+  var u=j.user||{};
+  return {access:j.access_token, refresh:j.refresh_token, exp:Date.now()+(Number(j.expires_in||3600)*1000),
+          email:u.email||cuerpo.email||'', uid:u.id||''};
+}
+function authEntrar(email,pass){ return authPedir({grant_type:'password',email:email,password:pass}); }
+function authRefrescar(){ return authPedir({grant_type:'refresh_token',refresh_token:NUBE.ses?NUBE.ses.refresh:''}); }
+
+async function nubeApi(ruta,opt,reintento){
+  opt=opt||{};
+  var h=Object.assign({'apikey':NUBE.key,'Content-Type':'application/json'},opt.headers||{});
+  if(NUBE.ses){
+    if(NUBE.ses.exp-30000<Date.now() && NUBE.ses.refresh && !reintento){
+      try{ sesGuardar(await authRefrescar()); }catch(e){}
+    }
+    if(NUBE.ses) h.Authorization='Bearer '+NUBE.ses.access;
+  }
+  var r=await fetch(NUBE.url+ruta, Object.assign({},opt,{headers:h}));
+  if(r.status===401 && !reintento && NUBE.ses && NUBE.ses.refresh){
+    try{ sesGuardar(await authRefrescar()); return nubeApi(ruta,opt,true); }catch(e){}
+  }
+  if(!r.ok){
+    var t=''; try{ t=await r.text(); }catch(e){}
+    throw new Error(r.status+' '+t.slice(0,160));
+  }
+  var ct=r.headers.get('content-type')||'';
+  if(ct.indexOf('json')<0) return null;
+  try{ return await r.json(); }catch(e){ return null; }
+}
+
+/* --- convertir entre el panel y las tablas --- */
+function toNeg(c){
+  return {id:c.id, codigo:c.codigo||'', negocio:c.negocio||'', tipo:c.tipo||'', ciudad:c.ciudad||'',
+    contacto:c.contacto||'', telefono:c.telefono||'', correo:c.correo||'', desde:c.desde||null,
+    plan_id:c.planId||null, precio:((c.precio===''||c.precio==null)?null:Number(c.precio)),
+    moneda:c.moneda||null, dia_cobro:parseInt(c.diaCobro,10)||1, estado:c.estado||'activo',
+    modo_corte:c.modoCorte||'auto', gracia:(c.gracia==null||c.gracia===''?null:parseInt(c.gracia,10)),
+    notas:c.notas||''};
+}
+function fromNeg(r){
+  return {id:r.id, codigo:r.codigo||'', negocio:r.negocio||'', tipo:r.tipo||'', ciudad:r.ciudad||'',
+    contacto:r.contacto||'', telefono:r.telefono||'', correo:r.correo||'', desde:r.desde||'',
+    planId:r.plan_id||'', precio:(r.precio==null?'':Number(r.precio)), moneda:r.moneda||'',
+    diaCobro:r.dia_cobro||1, estado:r.estado||'activo', modoCorte:r.modo_corte||'auto',
+    gracia:(r.gracia==null?'':Number(r.gracia)), notas:r.notas||'', pagos:[]};
+}
+function toPago(p,cid){
+  return {id:p.id, negocio_id:cid, periodo:p.periodo||null, fecha:p.fecha||null,
+    monto:Number(p.monto)||0, moneda:p.moneda||null, tasa:Number(p.tasa)||0,
+    monto_base:Number(p.montoBase)||0, metodo:p.metodo||'', ref:p.ref||'', nota:p.nota||'',
+    recibo:p.recibo||'', ts:p.ts||new Date().toISOString()};
+}
+function fromPago(r){
+  return {id:r.id, periodo:r.periodo||'', fecha:r.fecha||'', monto:Number(r.monto)||0,
+    moneda:r.moneda||'', tasa:Number(r.tasa)||0, montoBase:Number(r.monto_base)||0,
+    metodo:r.metodo||'', ref:r.ref||'', nota:r.nota||'', recibo:r.recibo||'', ts:r.ts||''};
+}
+
+/* --- leer todo de la nube --- */
+async function nubeLeer(){
+  var res=await Promise.all([
+    nubeApi('/rest/v1/pc_negocios?select=*&order=creado.asc'),
+    nubeApi('/rest/v1/pc_pagos?select=*&order=fecha.asc'),
+    nubeApi('/rest/v1/pc_planes?select=*'),
+    nubeApi('/rest/v1/pc_monedas?select=*'),
+    nubeApi('/rest/v1/pc_cfg?select=datos')
+  ]);
+  var neg=res[0]||[], pag=res[1]||[], pl=res[2]||[], mo=res[3]||[], cf=res[4]||[];
+  D=datosVacios();
+  if(cf[0] && cf[0].datos){
+    var d=cf[0].datos;
+    if(d.cfg) D.cfg=Object.assign(D.cfg,d.cfg);
+    if(d.seq) D.seq=Object.assign(D.seq,d.seq);
+  }
+  if(mo.length){ D.monedas=mo.map(function(m){ return {cod:m.cod,nom:m.nom||m.cod,sim:m.sim||m.cod,tasa:Number(m.tasa)||0,base:!!m.base}; }); }
+  D.planes=pl.map(function(x){ return {id:x.id,nombre:x.nombre||'',precio:(x.precio==null?'':Number(x.precio)),moneda:x.moneda||base().cod,incluye:x.incluye||''}; });
+  D.clientes=neg.map(fromNeg);
+  pag.forEach(function(r){
+    var c=D.clientes.filter(function(x){ return x.id===r.negocio_id; })[0];
+    if(c){ c.pagos=c.pagos||[]; c.pagos.push(fromPago(r)); }
+  });
+  asegurarBase();
+  NUBE.vacia=(!neg.length && !pl.length && !mo.length);
+}
+
+/* --- subir todo --- */
+function nubeEncolar(){
+  if(!NUBE.listo) return;
+  NUBE.estado='guardando'; pintarNube();
+  clearTimeout(NUBE.timer);
+  NUBE.timer=setTimeout(function(){ nubeEscribir(); }, 900);
+}
+async function nubeUpsert(tabla, filas, conflicto){
+  if(!filas.length) return;
+  await nubeApi('/rest/v1/'+tabla+'?on_conflict='+encodeURIComponent(conflicto), {
+    method:'POST',
+    headers:{'Prefer':'resolution=merge-duplicates,return=minimal'},
+    body:JSON.stringify(filas)
+  });
+}
+async function nubeBorrar(tabla, campo, ids){
+  if(!ids.length) return;
+  await nubeApi('/rest/v1/'+tabla+'?'+campo+'=in.('+ids.map(encodeURIComponent).join(',')+')', {method:'DELETE',headers:{'Prefer':'return=minimal'}});
+}
+function mapaPor(arr,campo){ var o={}; arr.forEach(function(x){ o[String(x[campo])]=1; }); return o; }
+function sobran(antes, ahora){
+  if(!antes) return [];
+  var out=[]; for(var k in antes){ if(!ahora[k]) out.push(k); } return out;
+}
+
+async function nubeEscribir(){
+  if(!NUBE.listo) return;
+  if(NUBE.subiendo){ NUBE.otra=true; return; }
+  NUBE.subiendo=true; NUBE.estado='guardando'; pintarNube();
+  try{
+    var neg=[], pags=[];
+    D.clientes.forEach(function(c){
+      neg.push(toNeg(c));
+      (c.pagos||[]).forEach(function(p){ pags.push(toPago(p,c.id)); });
+    });
+    var planes=D.planes.map(function(p){ return {id:p.id,nombre:p.nombre||'',precio:(p.precio===''||p.precio==null?null:Number(p.precio)),moneda:p.moneda||null,incluye:p.incluye||''}; });
+    var mons=D.monedas.map(function(m){ return {cod:m.cod,nom:m.nom||m.cod,sim:m.sim||m.cod,tasa:Number(m.tasa)||0,base:!!m.base}; });
+
+    var act={neg:mapaPor(neg,'id'), pag:mapaPor(pags,'id'), pl:mapaPor(planes,'id'), mon:mapaPor(mons,'cod')};
+    var del={neg:sobran(NUBE.prev&&NUBE.prev.neg,act.neg), pag:sobran(NUBE.prev&&NUBE.prev.pag,act.pag),
+             pl:sobran(NUBE.prev&&NUBE.prev.pl,act.pl), mon:sobran(NUBE.prev&&NUBE.prev.mon,act.mon)};
+
+    await nubeUpsert('pc_negocios',neg,'owner,id');
+    await nubeUpsert('pc_pagos',pags,'owner,id');
+    await nubeUpsert('pc_planes',planes,'owner,id');
+    await nubeUpsert('pc_monedas',mons,'owner,cod');
+    await nubeUpsert('pc_cfg',[{datos:{cfg:D.cfg,seq:D.seq},actualizado:new Date().toISOString()}],'owner');
+
+    await nubeBorrar('pc_pagos','id',del.pag);
+    await nubeBorrar('pc_negocios','id',del.neg);
+    await nubeBorrar('pc_planes','id',del.pl);
+    await nubeBorrar('pc_monedas','cod',del.mon);
+
+    NUBE.prev=act; NUBE.ultimo=new Date(); NUBE.estado='ok'; NUBE.err='';
+    guardarLocal();
+  }catch(e){
+    NUBE.estado=(navigator.onLine===false)?'off':'error';
+    NUBE.err=String((e&&e.message)||e);
+  }
+  NUBE.subiendo=false; pintarNube();
+  if(NUBE.otra){ NUBE.otra=false; nubeEncolar(); }
+}
+
+/* --- estado visual --- */
+function pintarNube(){
+  var el=document.getElementById('h-cloud');
+  var u=document.getElementById('h-user');
+  if(u){
+    u.innerHTML = (NUBE.ses&&NUBE.ses.email)
+      ? ('<div>'+esc(NUBE.ses.email)+'</div><a href="#" data-act="salir">Salir</a>')
+      : '';
+  }
+  if(!el) return;
+  var txt='Nube', cls='';
+  if(NUBE.estado==='ok'){ txt='Guardado'; cls='ok'; }
+  else if(NUBE.estado==='guardando'){ txt='Guardando…'; cls='warn'; }
+  else if(NUBE.estado==='off'){ txt='Sin conexión'; cls='warn'; }
+  else if(NUBE.estado==='error'){ txt='Sin guardar'; cls='bad'; }
+  el.className='cloud '+cls;
+  var hora = NUBE.ultimo ? (String(NUBE.ultimo.getHours()).padStart(2,'0')+':'+String(NUBE.ultimo.getMinutes()).padStart(2,'0')) : '';
+  el.innerHTML='☁️ <b>'+esc(txt)+(hora?' <span class="h">· '+hora+'</span>':'')+'</b>';
+  el.title = 'Nube: '+txt+(NUBE.err?('\n'+NUBE.err):'')+'\nSe guarda automáticamente en Supabase.';
+}
+
+/* --- entrada y salida --- */
+function loginMsg(id,txt){ var e=document.getElementById(id); if(e) e.textContent=txt||''; }
+function mostrarLogin(paso,msg){
+  var L=document.getElementById('login'); if(!L) return;
+  L.classList.add('on');
+  document.getElementById('lg-setup').hidden = (paso!=='setup');
+  document.getElementById('lg-form').hidden  = (paso==='setup');
+  if(paso==='setup' && NUBE.url){ var a=document.getElementById('l-url'); if(a&&!a.value) a.value=NUBE.url; }
+  if(msg) loginMsg(paso==='setup'?'lg-msg1':'lg-msg2', msg);
+  var m=document.getElementById('l-mail'); if(m && !m.value){ var g=localStorage.getItem('pc_mail')||''; if(g) m.value=g; }
+  setTimeout(function(){ var f=document.getElementById(paso==='setup'?'l-url':'l-mail'); if(f) try{ f.focus(); }catch(e){} },120);
+}
+function ocultarLogin(){ var L=document.getElementById('login'); if(L) L.classList.remove('on'); }
+
+async function entrarAlPanel(email,pass){
+  var b=document.getElementById('lg-entrar');
+  if(b){ b.disabled=true; b.textContent='Entrando…'; }
+  loginMsg('lg-msg2','');
+  try{
+    sesGuardar(await authEntrar(email,pass));
+    try{ localStorage.setItem('pc_mail',email); }catch(e){}
+    await arrancarNube();
+    ocultarLogin(); render(); toast('Bienvenido');
+  }catch(e){
+    var m=String((e&&e.message)||e);
+    loginMsg('lg-msg2', (/invalid|grant|credentials|400/i.test(m)) ? 'Correo o clave incorrectos. Revísalos y vuelve a intentar.' : ('No se pudo entrar. '+m));
+  }finally{
+    if(b){ b.disabled=false; b.textContent='Entrar al panel'; }
+  }
+}
+function guardarConexion(){
+  var u=(document.getElementById('l-url')||{}).value||'';
+  var k=(document.getElementById('l-key')||{}).value||'';
+  u=String(u).trim(); k=String(k).trim();
+  if(!/^https?:\/\//i.test(u)){ loginMsg('lg-msg1','La dirección debe empezar por https://'); return; }
+  if(k.length<40){ loginMsg('lg-msg1','Esa clave parece incompleta. Copia la clave pública (anon public) completa.'); return; }
+  supaCfgGuardar(u,k);
+  loginMsg('lg-msg1','');
+  mostrarLogin('login');
+}
+function salirDelPanel(){
+  if(!confirm('¿Cerrar la sesión del panel en este equipo?\n\nTus datos quedan guardados en la nube.')) return;
+  sesBorrar(); NUBE.listo=false; location.reload();
+}
+
+async function arrancarNube(){
+  var antes=null;
+  try{ antes=JSON.parse(JSON.stringify(D)); }catch(e){}
+  await nubeLeer();
+  var migrar=false;
+  if(!localStorage.getItem(PC_MIG) && antes && (antes.clientes.length||antes.planes.length)){
+    var traer=false;
+    (antes.clientes||[]).forEach(function(c){
+      var ya=D.clientes.filter(function(x){ return x.id===c.id; })[0];
+      if(!ya){ D.clientes.push(c); traer=true; }
+    });
+    (antes.planes||[]).forEach(function(p){
+      var ya=D.planes.filter(function(x){ return x.id===p.id; })[0];
+      if(!ya){ D.planes.push(p); traer=true; }
+    });
+    (antes.monedas||[]).forEach(function(m){
+      if(!D.monedas.filter(function(x){ return x.cod===m.cod; })[0]){ D.monedas.push(m); traer=true; }
+    });
+    if((!D.cfg || !D.cfg.empresa) && antes.cfg && antes.cfg.empresa){ D.cfg=Object.assign({},D.cfg,antes.cfg); traer=true; }
+    if(antes.seq && antes.seq.recibo && (!D.seq || !D.seq.recibo || antes.seq.recibo>D.seq.recibo)){ D.seq=Object.assign({},D.seq,antes.seq); traer=true; }
+    migrar=traer;
+    try{ localStorage.setItem(PC_MIG,'1'); }catch(e){}
+  }
+  NUBE.listo=true;
+  NUBE.prev={neg:mapaPor(D.clientes,'id'), pag:mapaPor([].concat.apply([],D.clientes.map(function(c){return c.pagos||[];})),'id'),
+             pl:mapaPor(D.planes,'id'), mon:mapaPor(D.monedas,'cod')};
+  if(migrar || NUBE.vacia){ await nubeEscribir(); }
+  else { NUBE.estado='ok'; pintarNube(); }
 }
 
 /* ---------- utilidades ---------- */
@@ -568,6 +928,7 @@ function pintarCabecera(){
   if(st) st.innerHTML='<b>'+activos+'</b> negocio'+(activos===1?'':'s')+' activo'+(activos===1?'':'s')
       +(venc?(' · <b style="color:#ffb0bd">'+venc+'</b> vencido'+(venc===1?'':'s')):'')+'<br>'+mesTxt(PER);
   var vr=document.getElementById('h-ver'); if(vr) vr.textContent=PC_VERSION;
+  pintarNube();
 
   function item(tab,ic,lbl,sub,badge){
     var al=(badge>0);
@@ -1330,6 +1691,14 @@ function renderCfg(){
     + '</div><div class="mini" style="margin-top:8px">Los planes que le ofreces a cada negocio y las monedas con su tasa del día.</div>';
   h+=cfgSec('💳','Planes y monedas','Lo que cobras y en qué moneda',b7);
 
+  /* nube */
+  var b8='<div class="chips">'
+    + '<button class="b-ghost b-sm" data-act="syncNow">🔄 Guardar ahora en la nube</button>'
+    + '<button class="b-ghost b-sm" data-act="lgCambiar">🔑 Cambiar conexión</button>'
+    + '<button class="b-ghost b-sm" data-act="salir">🚪 Cerrar sesión</button>'
+    + '</div><div class="mini" style="margin-top:8px">Sesión: <b>'+esc(NUBE.ses&&NUBE.ses.email?NUBE.ses.email:'—')+'</b>. Todo lo que cambias se guarda solo en tu cuenta de forma segura. Si te quedas sin internet puedes seguir viendo los datos, pero no se guardarán hasta que vuelvas a conectarte.</div>';
+  h+=cfgSec('☁️','Conexión con la nube','Tu cuenta y la sincronización',b8);
+
   /* zona peligrosa */
   var b8='<div class="chips">'
     + '<button class="b-danger b-fill" data-act="cfgBorrar">🗑️ Borrar todos los negocios</button>'
@@ -1403,6 +1772,10 @@ document.addEventListener('click', function(ev){
       TABSEL = (t.getAttribute('data-tab')==='cfg') ? 'cfg' : 'panel';
       cerrarMenu(); render(); break;
     case 'sideToggle': alternarMenu(); break;
+    case 'salir': salirDelPanel(); break;
+    case 'syncNow': nubeEscribir().then(function(){ toast(NUBE.estado==='ok'?'Guardado en la nube':(NUBE.estado==='off'?'Sin conexión: se guardará al volver':'No se pudo guardar')); }); break;
+    case 'lgConexion': guardarConexion(); break;
+    case 'lgCambiar': mostrarLogin('setup'); break;
     case 'sideClose': cerrarMenu(); break;
     case 'tema':
       if(document.getElementById('c-panel')) recogerCfg();
@@ -1475,13 +1848,42 @@ document.addEventListener('keydown', function(ev){
 });
 
 /* ---------- arranque ---------- */
-function inicio(){
+async function inicio(){
   cargar();
   aplicarTema();
   aplicarMenu();
+  var hay=supaCfgLeer();
+  if(!hay){ render(); mostrarLogin('setup'); return; }
+  var ses=sesLeer();
+  if(!ses){ render(); mostrarLogin('login'); return; }
+  try{
+    await arrancarNube();
+    ocultarLogin();
+  }catch(e){
+    var m=String((e&&e.message)||e);
+    if(m.indexOf('401')===0 || /JWT|token/i.test(m)){
+      sesBorrar(); NUBE.listo=false;
+      render(); mostrarLogin('login','Tu sesión venció. Entra otra vez.');
+      return;
+    }
+    NUBE.estado='off'; NUBE.err=m;
+    ocultarLogin();
+    toast('Sin conexión: estás viendo lo último guardado en este equipo');
+  }
   render();
 }
-document.addEventListener('DOMContentLoaded', inicio);
+document.addEventListener('submit', function(ev){
+  var f=ev.target;
+  if(f && f.id==='lg-form'){
+    ev.preventDefault();
+    var mail=String((document.getElementById('l-mail')||{}).value||'').trim();
+    var pass=String((document.getElementById('l-pass')||{}).value||'');
+    if(!mail || !pass){ loginMsg('lg-msg2','Escribe tu correo y tu clave.'); return; }
+    entrarAlPanel(mail,pass);
+  }
+});
+window.addEventListener('online', function(){ if(NUBE.listo){ toast('Volvió la conexión'); nubeEscribir(); } });
+window.addEventListener('offline', function(){ if(NUBE.listo){ NUBE.estado='off'; pintarNube(); } });
 if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', inicio); } else { inicio(); }
 </script>
 </body>
