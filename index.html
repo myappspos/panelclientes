@@ -473,7 +473,7 @@ body[data-side="mini"] .sbadge{
    - Multimoneda: el dólar es la base y cada moneda lleva su tasa.
    - Planes y monedas los crea y edita el dueño del panel.
    ======================================================================= */
-var PC_VERSION = 'v2.1 · 20/11/2026';
+var PC_VERSION = 'v2.2 · 20/11/2026';
 var PC_KEY = 'panelClientes_v1';
 var PC_SUPA = 'pc_supa_cfg';
 var PC_SES  = 'pc_sesion';
@@ -540,6 +540,10 @@ function asegurarBase(){
    - Nunca se usa la clave secreta: solo la publica (anon key).
    ===================================================================== */
 var NUBE={url:'',key:'',ses:null,listo:false,timer:null,subiendo:false,otra:false,estado:'',ultimo:null,err:'',prev:null};
+
+/* Conexion ya puesta de fabrica (solo la clave publica; la secreta no va aqui) */
+var PC_SUPA_DEF={url:'https://wazhhzbwmzitqlgoxjuf.supabase.co',
+  key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhemhoemJ3bXppdHFsZ294anVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMTg1MjcsImV4cCI6MjEwODc5NDUyN30.SLSHVFtomTb-n4yRM-zTPjIMU8IpDizAGMEDt4u0PyM'};
 
 function limpiarUrl(u){
   var x=String(u||'').trim();
@@ -1870,6 +1874,10 @@ async function inicio(){
   aplicarTema();
   aplicarMenu();
   var hay=supaCfgLeer();
+  if(!hay && PC_SUPA_DEF.url){
+    supaCfgGuardar(PC_SUPA_DEF.url, PC_SUPA_DEF.key);
+    hay=supaCfgLeer();
+  }
   if(!hay){ render(); mostrarLogin('setup'); return; }
   var ses=sesLeer();
   if(!ses){ render(); mostrarLogin('login'); return; }
