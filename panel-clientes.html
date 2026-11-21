@@ -496,7 +496,7 @@ body[data-side="mini"] .sbadge{
    - Multimoneda: el dólar es la base y cada moneda lleva su tasa.
    - Planes y monedas los crea y edita el dueño del panel.
    ======================================================================= */
-var PC_VERSION = 'v3.2 · 21/11/2026';
+var PC_VERSION = 'v3.3 · 21/11/2026';
 var PC_KEY = 'panelClientes_v1';
 var PC_SUPA = 'pc_supa_cfg';
 var PC_SES  = 'pc_sesion';
@@ -653,6 +653,7 @@ function toNeg(c){
     o.aviso = (c.aviso==null||String(c.aviso).trim()==='') ? null : String(c.aviso).trim();
     o.aviso_hasta = c.avisoHasta || null;
     o.bloqueo_manual = !!c.bloqueoManual;
+    o.bloqueo_modo = (c.bloqueoModo==='solo_ver' ? 'solo_ver' : 'todo');
   }
   return o;
 }
@@ -664,7 +665,8 @@ function fromNeg(r){
     gracia:(r.gracia==null?'':Number(r.gracia)), notas:r.notas||'', pagos:[],
     modulos:(Array.isArray(r.modulos)?r.modulos.map(function(x){ return String(x).toLowerCase(); }):[]),
     usuariosMax:(r.usuarios_max==null?5:Number(r.usuarios_max)),
-    aviso:r.aviso||'', avisoHasta:(r.aviso_hasta||''), bloqueoManual:!!r.bloqueo_manual};
+    aviso:r.aviso||'', avisoHasta:(r.aviso_hasta||''), bloqueoManual:!!r.bloqueo_manual,
+    bloqueoModo:(r.bloqueo_modo==='solo_ver'?'solo_ver':'todo')};
 }
 function toPago(p,cid){
   return {id:p.id, negocio_id:cid, periodo:p.periodo||null, fecha:p.fecha||null,
@@ -1018,6 +1020,7 @@ function asegurarCodigos(){
     if(c.aviso==null) c.aviso='';
     if(c.avisoHasta==null) c.avisoHasta='';
     c.bloqueoManual=!!c.bloqueoManual;
+    c.bloqueoModo=(c.bloqueoModo==='solo_ver'?'solo_ver':'todo');
   });
   if(hubo) guardarLocal();
   return hubo;
@@ -1040,7 +1043,7 @@ function licenciaDe(c){
   var hoy=new Date(); hoy.setHours(0,0,0,0);
   var lim=new Date(vence.getTime()+g*86400000);
   var k;
-  if(c.bloqueoManual) k='bloqueado';
+  if(c.bloqueoManual) k=(c.bloqueoModo==='solo_ver'?'solo_ver':'bloqueado');
   else if(c.estado==='suspendido') k='bloqueado';
   else if(c.estado==='prueba') k='prueba';
   else if(hoy<vence) k='activo';
@@ -1048,8 +1051,8 @@ function licenciaDe(c){
   else k='bloqueado';
   var dias=Math.round((lim.getTime()-hoy.getTime())/86400000); if(dias<0) dias=0;
   return {k:k, vence:vence, gracia:g, dias:dias, periodo:per,
-    txt:{activo:'Activa',gracia:'En gracia',bloqueado:'Bloqueada',prueba:'En prueba'}[k],
-    cls:{activo:'bg-ok',gracia:'bg-warn',bloqueado:'bg-bad',prueba:'bg-off'}[k]};
+    txt:{activo:'Activa',gracia:'En gracia',bloqueado:'Bloqueada',prueba:'En prueba',solo_ver:'Solo consulta'}[k],
+    cls:{activo:'bg-ok',gracia:'bg-warn',bloqueado:'bg-bad',prueba:'bg-off',solo_ver:'bg-warn'}[k]};
 }
 function fechaD(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
 function modulosTxt(c){
@@ -1358,6 +1361,7 @@ function verFicha(id){
     +'<div class="row"><span>Días de gracia</span><b>'+L.gracia+' día(s)</b></div>'
     +'<div class="row"><span>Usuarios permitidos</span><b>'+esc(String(c.usuariosMax||5))+'</b></div>'
     +'<div class="row"><span>Módulos</span><b style="text-align:right;max-width:62%">'+esc(modulosTxt(c))+'</b></div>'
+    +'<div class="row"><span>Bloqueo manual</span><b>'+(c.bloqueoManual?('Sí · '+(c.bloqueoModo==='solo_ver'?'solo consulta':'corte total')):'No')+'</b></div>'
     +(c.aviso?('<div class="row"><span>Aviso</span><b style="text-align:right;max-width:62%">'+esc(c.aviso)+(c.avisoHasta?(' · hasta '+fechaCorta(c.avisoHasta)):'')+'</b></div>'):'')
     +'</div>';
 
@@ -1425,8 +1429,14 @@ function formLicencia(id){
   h+='<div class="field"><label>Aviso dentro de la app (opcional)</label><textarea id="li-aviso" rows="2" maxlength="200" placeholder="Ej: Su mensualidad está por vencer, pase por administración.">'+esc(c.aviso||'')+'</textarea></div>';
   h+='<div class="field" style="margin-bottom:6px"><label>Mostrar el aviso hasta</label><input id="li-avisoHasta" type="date" value="'+esc(String(c.avisoHasta||'').slice(0,10))+'"></div>';
   h+='<div class="mini" style="margin:-4px 0 12px">Si dejas la fecha vacía, el aviso se le muestra siempre. Si la fecha ya pasó, el aviso deja de verse solo.</div>';
-  h+='<label class="mod" style="margin-bottom:6px"><input type="checkbox" id="li-bloq"'+(c.bloqueoManual?' checked':'')+'> Bloquear la app ahora (aunque esté al día)</label>';
-  h+='<div class="mini" style="margin-bottom:12px">Úsalo cuando quieras cortarle el servicio de una vez. Al desmarcarlo vuelve a la regla normal de pagos.</div>';
+  var _modo=(c.bloqueoModo==='solo_ver'?'solo_ver':'todo');
+  h+='<label class="mod" style="margin-bottom:6px"><input type="checkbox" id="li-bloq"'+(c.bloqueoManual?' checked':'')+' onchange="var m=document.getElementById(\'li-bloq-modo\'); if(m) m.style.display=this.checked?\'block\':\'none\';"> Bloquear la app ahora (aunque esté al día)</label>';
+  h+='<div class="mini" style="margin-bottom:8px">Úsalo cuando quieras cortarle el servicio de una vez. Al desmarcarlo vuelve a la regla normal de pagos.</div>';
+  h+='<div id="li-bloq-modo" style="display:'+(c.bloqueoManual?'block':'none')+';background:#fff7ec;border:1px solid #f3d6ac;border-radius:10px;padding:10px 12px;margin-bottom:10px">'
+    +'<div style="font-size:12.5px;font-weight:800;color:#7a4a00;margin-bottom:6px">¿Cómo le corto el servicio?</div>'
+    +'<label class="mod" style="margin-bottom:6px"><input type="radio" name="li-bloqmodo" value="todo"'+(_modo==='todo'?' checked':'')+' onchange="licPreview()"> Cortar todo <span style="font-weight:600;font-size:11.5px;opacity:.85">· no deja entrar</span></label>'
+    +'<label class="mod" style="margin-bottom:0"><input type="radio" name="li-bloqmodo" value="solo_ver"'+(_modo==='solo_ver'?' checked':'')+' onchange="licPreview()"> Dejar solo consulta <span style="font-weight:600;font-size:11.5px;opacity:.85">· entra a mirar, no cobra ni cambia nada</span></label>'
+    +'</div>';
   h+='<div class="licbox" id="li-prev"></div>';
   h+='<div class="acciones"><button class="b-primary" data-act="licGuardar" data-id="'+esc(c.id)+'">💾 Guardar licencia</button>'
     +'<button class="b-ghost" data-act="cerrar">Cancelar</button></div>';
@@ -1439,11 +1449,13 @@ function licPreview(){
   var gN=parseInt((document.getElementById('li-gracia')||{}).value,10);
   var tmp={pagos:LIC_CTX.pagos, desde:LIC_CTX.desde, diaCobro:LIC_CTX.diaCobro,
            gracia:(isFinite(gN)?gN:3), estado:LIC_CTX.estado,
-           bloqueoManual:((document.getElementById('li-bloq')||{}).checked===true)};
+           bloqueoManual:((document.getElementById('li-bloq')||{}).checked===true),
+           bloqueoModo:((document.querySelector('#modal-box input[name="li-bloqmodo"]:checked')||{}).value==='solo_ver'?'solo_ver':'todo')};
   var L=licenciaDe(tmp);
   var det = L.k==='activo' ? ('Le quedan '+L.dias+' día(s) de servicio')
           : L.k==='gracia' ? ('Está en gracia: le quedan '+L.dias+' día(s) antes de bloquearse')
           : L.k==='prueba' ? 'En prueba: no se le bloquea ni se le cobra'
+          : L.k==='solo_ver' ? 'Entra en solo consulta: puede mirar, pero no cobrar ni mover nada'
           : 'La app se le bloquea al abrir';
   out.innerHTML='<div class="row"><span>Con estos datos</span><b><span class="badge '+L.cls+'">'+esc(L.txt)+'</span></b></div>'
     +'<div class="row"><span>Vence</span><b>'+fechaD(L.vence)+'</b></div>'
@@ -1481,6 +1493,8 @@ function guardarLicencia(id){
   c.aviso=String(g('li-aviso')||'').trim();
   c.avisoHasta=String(g('li-avisoHasta')||'').trim();
   c.bloqueoManual=((document.getElementById('li-bloq')||{}).checked===true);
+  var _mb=document.querySelector('#modal-box input[name="li-bloqmodo"]:checked');
+  c.bloqueoModo=(_mb && _mb.value==='solo_ver')?'solo_ver':'todo';
   guardar(); cerrarModal(); render();
   toast('Licencia guardada · código '+cod);
 }
@@ -1542,7 +1556,7 @@ function guardarCliente(id, esNuevo){
     obj.id=id; obj.pagos=[];
     obj.codigo=codigoNuevo(negocio);
     obj.modulos=MODULOS_APP.map(function(m){ return m[0]; });   /* todos, con el master */
-    obj.usuariosMax=5; obj.aviso=''; obj.avisoHasta=''; obj.bloqueoManual=false;
+    obj.usuariosMax=5; obj.aviso=''; obj.avisoHasta=''; obj.bloqueoManual=false; obj.bloqueoModo='todo';
     if(obj.gracia==null || obj.gracia==='') obj.gracia=3;
     D.clientes.push(obj);
   } else {
