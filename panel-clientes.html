@@ -496,7 +496,7 @@ body[data-side="mini"] .sbadge{
    - Multimoneda: el dólar es la base y cada moneda lleva su tasa.
    - Planes y monedas los crea y edita el dueño del panel.
    ======================================================================= */
-var PC_VERSION = 'v3.1 · 21/11/2026';
+var PC_VERSION = 'v3.2 · 21/11/2026';
 var PC_KEY = 'panelClientes_v1';
 var PC_SUPA = 'pc_supa_cfg';
 var PC_SES  = 'pc_sesion';
@@ -960,8 +960,32 @@ function activo(c){ return c.estado!=='suspendido'; }
    primer dia del mes siguiente al ultimo mes pagado + el dia de cobro,
    y despues los dias de gracia (3 por defecto).
    ===================================================================== */
-var MODULOS_APP=[['recepcion','Recepción'],['supervision','Supervisión'],['ama','Ama de Llaves'],
-                 ['mantenimiento','Mantenimiento'],['comidas','Comidas'],['reportes','Reportes']];
+/* Las areas de trabajo de la app del cliente. La ultima (Master) va con candado:
+   es la llave del dueño del negocio y no se puede apagar. */
+var MODULOS_APP=[['recepcion','Recepción'],['supervisor','Supervisor'],['administracion','Administración'],
+                 ['ama','Ama de Llaves'],['mantenimiento','Mantenimiento'],['vigilancia','Vigilancia'],
+                 ['master','Master']];
+var MODULOS_FIJOS=['master'];
+function modFijo(k){ return MODULOS_FIJOS.indexOf(k)>=0; }
+function normalizarModulos(arr){
+  arr=Array.isArray(arr)?arr:[];
+  if(!arr.length) return [];                       /* vacio = todos permitidos */
+  var viejos = arr.indexOf('supervision')>=0 || arr.indexOf('comidas')>=0 || arr.indexOf('reportes')>=0;
+  var out=[];
+  arr.forEach(function(k){
+    k=String(k||'').toLowerCase();
+    if(k==='supervision') k='supervisor';
+    if(k==='comidas'||k==='reportes') return;
+    var ok=MODULOS_APP.some(function(m){ return m[0]===k; });
+    if(ok && out.indexOf(k)<0) out.push(k);
+  });
+  /* Al pasar de la lista vieja a la nueva, las areas que antes no existian
+     quedan encendidas, para no dejar a nadie afuera por el cambio. */
+  if(viejos){ if(out.indexOf('administracion')<0) out.push('administracion');
+              if(out.indexOf('vigilancia')<0) out.push('vigilancia'); }
+  if(out.indexOf('master')<0) out.push('master');
+  return out;
+}
 
 function limpiarCodigo(t){
   var s=String(t==null?'':t);
@@ -987,7 +1011,9 @@ function asegurarCodigos(){
   var hubo=false;
   (D.clientes||[]).forEach(function(c){
     if(!String(c.codigo||'').trim()){ c.codigo=codigoNuevo(c.negocio, c.id); hubo=true; }
-    if(!Array.isArray(c.modulos)) c.modulos=[];
+    var _m0=JSON.stringify(c.modulos||[]);
+    c.modulos=normalizarModulos(c.modulos);
+    if(_m0!==JSON.stringify(c.modulos)) hubo=true;
     if(c.usuariosMax==null || c.usuariosMax==='') c.usuariosMax=5;
     if(c.aviso==null) c.aviso='';
     if(c.avisoHasta==null) c.avisoHasta='';
@@ -1031,7 +1057,7 @@ function modulosTxt(c){
     var f=MODULOS_APP.filter(function(x){ return x[0]===k; })[0];
     return f?f[1]:k;
   });
-  return arr.length?arr.join(' · '):'Sin módulos asignados';
+  return arr.length?arr.join(' · '):'Todos los módulos';
 }
 function copiarCodigo(txt){
   var t=String(txt||'').trim(); if(!t) return;
@@ -1383,10 +1409,15 @@ function formLicencia(id){
     +'<button class="b-ghost b-sm" data-act="licAzar" data-id="'+esc(c.id)+'">🎲 Generar otro</button></div>';
   h+='<div class="field" style="margin-bottom:6px"><label>Módulos que tiene activos</label></div><div class="mods">'
     + MODULOS_APP.map(function(m){
+        if(modFijo(m[0])){
+          return '<span class="mod" style="cursor:default;background:#eaf6ee;border-color:#bfe3c9;color:#1d6b38;font-weight:700">'
+            +'🔒 '+esc(m[1])+' <span style="font-weight:600;font-size:11px;opacity:.85">· siempre activo</span></span>';
+        }
         return '<label class="mod"><input type="checkbox" data-mod="'+m[0]+'"'+(mods.indexOf(m[0])>=0?' checked':'')+'> '+esc(m[1])+'</label>';
       }).join('')
     +'</div>';
-  h+='<div class="mini" style="margin:2px 0 12px">Lo que dejes sin marcar no le aparece en la app. '
+  h+='<div class="mini" style="margin:2px 0 12px">Lo que dejes sin marcar no le aparece en la app. El <b>Master</b> va con candado: '
+    +'es la llave del dueño del negocio y no se apaga. '
     +'<button class="b-ghost b-sm" data-act="licTodos">Marcar todos</button></div>';
   h+='<div class="row2"><div class="field"><label>Usuarios permitidos</label><input id="li-usuarios" type="number" min="1" max="99" value="'+esc(String(c.usuariosMax||5))+'" inputmode="numeric"></div>'
     +'<div class="field"><label>Días de gracia</label><input id="li-gracia" type="number" min="0" max="30" value="'+L.gracia+'" inputmode="numeric"></div></div>';
@@ -1428,7 +1459,7 @@ function licAzar(id){
   el.value=cand; licPreview();
 }
 function licTodos(){
-  var ins=document.querySelectorAll('#modal-box .mods input[data-mod]');
+  var ins=document.querySelectorAll('#modal-box .mods input[data-mod]:not([disabled])');
   var todos=true;
   for(var i=0;i<ins.length;i++){ if(!ins[i].checked){ todos=false; break; } }
   for(var j=0;j<ins.length;j++){ ins[j].checked=!todos; }
@@ -1441,8 +1472,9 @@ function guardarLicencia(id){
   if(cod.length<3){ alert('El código debe tener al menos 3 letras o números. Ejemplo: HOTELJARA'); return; }
   if(codigoExiste(cod,id)){ alert('Ese código ya lo usa otro negocio. Prueba otro, por ejemplo '+cod+'2.'); return; }
   var mods=[];
-  var ins=document.querySelectorAll('#modal-box .mods input[data-mod]');
+  var ins=document.querySelectorAll('#modal-box .mods input[data-mod]:not([disabled])');
   for(var i=0;i<ins.length;i++){ if(ins[i].checked) mods.push(ins[i].getAttribute('data-mod')); }
+  mods=normalizarModulos(mods); if(!mods.length) mods=['master'];   /* siempre queda el master */
   var u=parseInt(g('li-usuarios'),10); if(!isFinite(u)||u<1) u=1; if(u>99) u=99;
   var gr=parseInt(g('li-gracia'),10); if(!isFinite(gr)||gr<0) gr=3; if(gr>30) gr=30;
   c.codigo=cod; c.modulos=mods; c.usuariosMax=u; c.gracia=gr;
@@ -1509,7 +1541,7 @@ function guardarCliente(id, esNuevo){
   if(esNuevo){
     obj.id=id; obj.pagos=[];
     obj.codigo=codigoNuevo(negocio);
-    obj.modulos=MODULOS_APP.map(function(m){ return m[0]; });
+    obj.modulos=MODULOS_APP.map(function(m){ return m[0]; });   /* todos, con el master */
     obj.usuariosMax=5; obj.aviso=''; obj.avisoHasta=''; obj.bloqueoManual=false;
     if(obj.gracia==null || obj.gracia==='') obj.gracia=3;
     D.clientes.push(obj);
