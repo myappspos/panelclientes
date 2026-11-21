@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#070b16">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Panel">
 <title>Panel de clientes</title>
 <style>
 :root{
@@ -144,6 +150,23 @@ label{display:block;font-size:11.5px;font-weight:800;color:#9fb0d2;margin:0 0 5p
 .bg-bad{background:rgba(255,111,139,.15);color:#ffa3b4;border-color:rgba(255,111,139,.4);box-shadow:0 0 16px -7px rgba(255,111,139,.75)}
 .bg-off{background:rgba(255,255,255,.07);color:#a3b1cd;border-color:rgba(255,255,255,.14)}
 .tag{font-size:10px;background:rgba(143,124,255,.16);color:#c3b8ff;border:1px solid rgba(143,124,255,.3);border-radius:7px;padding:2px 7px;font-weight:800}
+/* --- licencia de la app --- */
+.codechip{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;font-weight:800;letter-spacing:.7px;
+  background:rgba(79,124,255,.16);color:#bfd2ff;border:1px solid rgba(79,124,255,.45);border-radius:7px;padding:3px 8px;
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;user-select:all;white-space:nowrap}
+.codechip:hover{background:rgba(79,124,255,.28);color:#fff}
+.codechip.sin{opacity:.55;border-style:dashed;cursor:default}
+.lic{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:7px;font-size:11.5px;color:#93a2c2}
+.lic b{color:#dbe6ff}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:7px;margin-bottom:6px}
+.mod{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  border-radius:9px;padding:8px 10px;font-size:12.5px;color:#c8d4ec;cursor:pointer;font-weight:600}
+.mod:hover{background:rgba(255,255,255,.09)}
+.mod input{width:16px;height:16px;accent-color:#4f7cff;cursor:pointer;flex:0 0 auto;margin:0}
+.licbox{border:1px solid rgba(255,255,255,.11);border-radius:11px;padding:9px 12px;background:rgba(255,255,255,.03);margin-bottom:12px}
+.licbox .row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:#a9b7d2;padding:3px 0;border-bottom:1px dashed rgba(255,255,255,.07)}
+.licbox .row:last-child{border-bottom:none}
+.licbox .row b{color:#e8f0ff;font-weight:800}
 .cli-d{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--tinta2);margin-top:8px}
 .cli-d b{color:#eaf2ff;font-variant-numeric:tabular-nums}
 .cli-a{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
@@ -243,6 +266,47 @@ body[data-dens="compacta"] .cli{padding:9px 11px;margin-bottom:6px}
 body[data-dens="compacta"] .kpi{padding:8px 10px 9px}
 body[data-dens="compacta"] .kpi .v{font-size:18px}
 body[data-dens="compacta"] .cli-d{margin-top:5px}
+
+
+/* ---------- entrada al panel (clave) ---------- */
+.login{position:fixed;inset:0;z-index:900;display:none;place-items:center;padding:18px;
+  background:radial-gradient(900px 600px at 15% 0%,rgba(79,124,255,.30),transparent 60%),
+             radial-gradient(700px 500px at 90% 100%,rgba(63,224,160,.18),transparent 60%),
+             linear-gradient(180deg,#070c22,#050814)}
+.login.on{display:grid}
+.login-card{width:100%;max-width:400px;border-radius:20px;padding:22px;
+  background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.03));
+  border:1px solid var(--linea2);box-shadow:0 40px 90px -50px #000, inset 0 1px 0 rgba(255,255,255,.09);
+  backdrop-filter:blur(16px)}
+.login-brand{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.login-brand .logo{width:46px;height:46px;font-size:15px;border-radius:14px}
+.lg-t{font-size:16px;font-weight:900;color:#f2f7ff;letter-spacing:.2px}
+.lg-s{font-size:11px;color:#8fa1c2;margin-top:2px}
+.lg-h{font-size:12px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;color:#8ea6d6;margin:6px 0 10px}
+.login .field{margin-bottom:10px}
+.login .field label{display:block;font-size:11.5px;font-weight:800;color:#a9bad8;margin-bottom:5px}
+.login input,.login textarea{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:11px;
+  border:1px solid var(--linea2);background:rgba(4,8,22,.55);color:#eef5ff;font-family:inherit;font-size:14px}
+.login input:focus,.login textarea:focus{outline:none;border-color:var(--cian);box-shadow:0 0 0 3px rgba(79,124,255,.18)}
+.login textarea{resize:vertical;font-size:11px;font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.45}
+.lg-btn{width:100%;justify-content:center;margin-top:4px;min-height:44px;font-size:14px}
+.lg-msg{font-size:12px;color:#ffb0bd;margin-top:10px;min-height:15px;line-height:1.45}
+.lg-link{display:block;width:100%;margin-top:12px;background:none;border:0;color:#8fa9d8;font-size:11.5px;
+  text-decoration:underline;cursor:pointer;font-family:inherit}
+.lg-link:hover{color:#cfe0ff}
+.lg-foot{margin-top:14px;padding-top:11px;border-top:1px solid var(--linea);font-size:10.5px;color:#6f80a0;line-height:1.5}
+.lg-mini{font-size:10.5px;color:#8397b8;line-height:1.5;margin-top:-2px}
+
+/* aviso de nube en la cabecera */
+.cloud{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;padding:6px 10px;border-radius:9px;
+  border:1px solid var(--linea);background:rgba(255,255,255,.05);font-size:10.5px;font-weight:800;color:#b8c8e6;white-space:nowrap}
+.cloud.ok{color:#8ef0bf;border-color:rgba(63,224,160,.35);background:rgba(63,224,160,.10)}
+.cloud.warn{color:#ffd79a;border-color:rgba(255,193,94,.35);background:rgba(255,193,94,.10)}
+.cloud.bad{color:#ffb0bd;border-color:rgba(255,111,139,.40);background:rgba(255,111,139,.12)}
+.side-user{font-size:10.5px;color:#93a6c8;line-height:1.6;word-break:break-word;margin-bottom:6px}
+.side-user a{color:#9fc4ff;text-decoration:none;font-weight:800}
+.side-user a:hover{text-decoration:underline}
+@media(max-width:640px){.cloud{font-size:11px;padding:5px 8px;gap:4px}.cloud .h{display:none}}
 
 /* ---------- barra lateral futurista ---------- */
 .shell{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh;transition:grid-template-columns .22s ease}
@@ -368,6 +432,7 @@ body[data-side="mini"] .sbadge{
     </div>
     <nav class="side-nav" id="h-tabs"></nav>
     <div class="side-foot">
+      <div class="side-user" id="h-user"></div>
       <div class="side-stat" id="h-stat"></div>
       <div class="side-ver" id="h-ver"></div>
     </div>
@@ -382,6 +447,7 @@ body[data-side="mini"] .sbadge{
           <div class="h1" id="h-page">Panel</div>
           <div class="sub" id="h-sub">Lo que cobraste y lo que falta por cobrar.</div>
         </div>
+        <span class="cloud" id="h-cloud" title="Estado de la nube">☁️ <b>Nube</b></span>
         <button class="side-mini" data-act="sideToggle" title="Ocultar el menú" aria-label="Ocultar menú">⟨</button>
       </div>
     </header>
@@ -392,6 +458,35 @@ body[data-side="mini"] .sbadge{
 </div>
 <div class="modal-bg" id="modal-bg" hidden><div class="modal" id="modal-box"></div></div>
 <div id="toast"></div>
+<div id="login" class="login">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="logo" id="lg-logo">PC</div>
+      <div><div class="lg-t">Panel de clientes</div><div class="lg-s">Tu centro de control privado</div></div>
+    </div>
+
+    <div id="lg-setup" hidden>
+      <div class="lg-h">Conectar con la nube</div>
+      <div class="field"><label>Dirección del proyecto</label><input id="l-url" placeholder="https://xxxxxxxx.supabase.co" autocomplete="off" spellcheck="false"></div>
+      <div class="field"><label>Clave pública (anon key)</label><textarea id="l-key" rows="4" placeholder="eyJhbGciOiJIUzI1NiIs..." spellcheck="false"></textarea></div>
+      <div class="lg-mini">Están en Supabase → Project Settings → API. La clave pública se puede usar aquí sin peligro; la clave secreta NO se usa nunca en el panel.</div>
+      <button class="b-primary lg-btn" type="button" data-act="lgConexion">Guardar conexión</button>
+      <div class="lg-msg" id="lg-msg1"></div>
+    </div>
+
+    <form id="lg-form" hidden>
+      <div class="lg-h">Entrar</div>
+      <div class="field"><label>Tu correo</label><input id="l-mail" type="email" autocomplete="username" placeholder="tucorreo@ejemplo.com"></div>
+      <div class="field"><label>Tu clave</label><input id="l-pass" type="password" autocomplete="current-password" placeholder="Tu clave del panel"></div>
+      <button class="b-primary lg-btn" type="submit" id="lg-entrar">Entrar al panel</button>
+      <div class="lg-msg" id="lg-msg2"></div>
+      <button type="button" class="lg-link" data-act="lgCambiar">Cambiar la conexión</button>
+    </form>
+
+    <div class="lg-foot">Solo el dueño del panel entra aquí. Los negocios que alquilan las apps no tienen acceso a esta pantalla.</div>
+  </div>
+</div>
+
 
 <script>
 /* =======================================================================
@@ -401,8 +496,11 @@ body[data-side="mini"] .sbadge{
    - Multimoneda: el dólar es la base y cada moneda lleva su tasa.
    - Planes y monedas los crea y edita el dueño del panel.
    ======================================================================= */
-var PC_VERSION = 'v1.4 · 20/11/2026';
+var PC_VERSION = 'v3.1 · 21/11/2026';
 var PC_KEY = 'panelClientes_v1';
+var PC_SUPA = 'pc_supa_cfg';
+var PC_SES  = 'pc_sesion';
+var PC_MIG  = 'pc_migrado';
 
 /* ---------- datos ---------- */
 function datosVacios(){
@@ -427,7 +525,7 @@ var D = null;
 function cargar(){
   try{
     var raw = localStorage.getItem(PC_KEY);
-    if(!raw){ D = datosVacios(); guardar(); return; }
+    if(!raw){ D = datosVacios(); guardarLocal(); return; }
     var o = JSON.parse(raw);
     D = datosVacios();
     if(o && typeof o==='object'){
@@ -440,8 +538,12 @@ function cargar(){
     asegurarBase();
   }catch(e){ D = datosVacios(); }
 }
-function guardar(){
+function guardarLocal(){
   try{ localStorage.setItem(PC_KEY, JSON.stringify(D)); }catch(e){}
+}
+function guardar(){
+  guardarLocal();
+  if(NUBE.listo) nubeEncolar();
 }
 function asegurarBase(){
   var tieneBase = false;
@@ -449,6 +551,321 @@ function asegurarBase(){
   if(!tieneBase){ if(!D.monedas.length) D.monedas.push({cod:'USD',nom:'Dólar',sim:'$',tasa:1,base:false}); D.monedas[0].base=true; D.monedas[0].tasa=1; }
   var b = D.monedas.filter(function(m){ return m.base; })[0];
   D.monedas.forEach(function(m){ if(m!==b){ m.tasa = Number(m.tasa)||0; } });
+}
+
+
+/* =====================================================================
+   NUBE · Supabase
+   - El panel entra con correo y clave (Supabase Auth).
+   - Los datos viven en las tablas pc_* y se copian aqui para trabajar.
+   - Si no hay internet, se sigue trabajando con la copia del equipo y
+     se sube cuando vuelve la conexion.
+   - Nunca se usa la clave secreta: solo la publica (anon key).
+   ===================================================================== */
+var NUBE={url:'',key:'',ses:null,listo:false,timer:null,subiendo:false,otra:false,estado:'',ultimo:null,err:'',prev:null,lic:false};
+
+/* Conexion ya puesta de fabrica (solo la clave publica; la secreta no va aqui) */
+var PC_SUPA_DEF={url:'https://wazhhzbwmzitqlgoxjuf.supabase.co',
+  key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhemhoemJ3bXppdHFsZ294anVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMyMTg1MjcsImV4cCI6MjEwODc5NDUyN30.SLSHVFtomTb-n4yRM-zTPjIMU8IpDizAGMEDt4u0PyM'};
+
+function limpiarUrl(u){
+  var x=String(u||'').trim();
+  x=x.replace(/\/+$/,'');
+  for(var i=0;i<4;i++){
+    if(/\/rest\/v1$/i.test(x)){ x=x.replace(/\/rest\/v1$/i,''); continue; }
+    if(/\/auth\/v1$/i.test(x)){ x=x.replace(/\/auth\/v1$/i,''); continue; }
+    if(/\/v1$/i.test(x) && /\/rest$/i.test(x.replace(/\/v1$/i,''))){ x=x.replace(/\/v1$/i,''); continue; }
+    break;
+  }
+  return x.replace(/\/+$/,'');
+}
+function limpiarClave(k){
+  var x=String(k||'').trim().replace(/^['"]+|['"]+$/g,'').replace(/\s+/g,'');
+  return x;
+}
+function supaCfgLeer(){
+  try{
+    var o=JSON.parse(localStorage.getItem(PC_SUPA)||'null');
+    if(o && o.url && o.key){ NUBE.url=limpiarUrl(o.url); NUBE.key=limpiarClave(o.key); return true; }
+  }catch(e){}
+  return false;
+}
+function supaCfgGuardar(url,key){
+  NUBE.url=limpiarUrl(url); NUBE.key=limpiarClave(key);
+  try{ localStorage.setItem(PC_SUPA, JSON.stringify({url:NUBE.url,key:NUBE.key})); }catch(e){}
+}
+function sesLeer(){
+  try{
+    var o=JSON.parse(localStorage.getItem(PC_SES)||'null');
+    if(o && o.access && (o.exp>Date.now() || o.refresh)){ NUBE.ses=o; return true; }
+  }catch(e){}
+  return false;
+}
+function sesGuardar(o){ NUBE.ses=o; try{ localStorage.setItem(PC_SES, JSON.stringify(o)); }catch(e){} }
+function sesBorrar(){ NUBE.ses=null; try{ localStorage.removeItem(PC_SES); }catch(e){} }
+
+async function authPedir(cuerpo){
+  var r=await fetch(NUBE.url+'/auth/v1/token?grant_type='+encodeURIComponent(cuerpo.grant_type),{
+    method:'POST', headers:{'apikey':NUBE.key,'Content-Type':'application/json'}, body:JSON.stringify(cuerpo)
+  });
+  var j={}; try{ j=await r.json(); }catch(e){}
+  if(!r.ok) throw new Error(j.error_description||j.msg||j.error||'No se pudo entrar');
+  var u=j.user||{};
+  return {access:j.access_token, refresh:j.refresh_token, exp:Date.now()+(Number(j.expires_in||3600)*1000),
+          email:u.email||cuerpo.email||'', uid:u.id||''};
+}
+function authEntrar(email,pass){ return authPedir({grant_type:'password',email:email,password:pass}); }
+function authRefrescar(){ return authPedir({grant_type:'refresh_token',refresh_token:NUBE.ses?NUBE.ses.refresh:''}); }
+
+async function nubeApi(ruta,opt,reintento){
+  opt=opt||{};
+  var h=Object.assign({'apikey':NUBE.key,'Content-Type':'application/json'},opt.headers||{});
+  if(NUBE.ses){
+    if(NUBE.ses.exp-30000<Date.now() && NUBE.ses.refresh && !reintento){
+      try{ sesGuardar(await authRefrescar()); }catch(e){}
+    }
+    if(NUBE.ses) h.Authorization='Bearer '+NUBE.ses.access;
+  }
+  var r=await fetch(NUBE.url+ruta, Object.assign({},opt,{headers:h}));
+  if(r.status===401 && !reintento && NUBE.ses && NUBE.ses.refresh){
+    try{ sesGuardar(await authRefrescar()); return nubeApi(ruta,opt,true); }catch(e){}
+  }
+  if(!r.ok){
+    var t=''; try{ t=await r.text(); }catch(e){}
+    throw new Error(r.status+' '+t.slice(0,160));
+  }
+  var ct=r.headers.get('content-type')||'';
+  if(ct.indexOf('json')<0) return null;
+  try{ return await r.json(); }catch(e){ return null; }
+}
+
+/* --- convertir entre el panel y las tablas --- */
+function toNeg(c){
+  var o={id:c.id, codigo:(c.codigo||'').trim()||null, negocio:c.negocio||'', tipo:c.tipo||'', ciudad:c.ciudad||'',
+    contacto:c.contacto||'', telefono:c.telefono||'', correo:c.correo||'', desde:c.desde||null,
+    plan_id:c.planId||null, precio:((c.precio===''||c.precio==null)?null:Number(c.precio)),
+    moneda:c.moneda||null, dia_cobro:parseInt(c.diaCobro,10)||1, estado:c.estado||'activo',
+    modo_corte:c.modoCorte||'auto', gracia:(c.gracia==null||c.gracia===''?null:parseInt(c.gracia,10)),
+    notas:c.notas||''};
+  if(NUBE.lic){
+    o.modulos = Array.isArray(c.modulos) ? c.modulos : [];
+    o.usuarios_max = (c.usuariosMax==null||c.usuariosMax==='') ? 5 : (parseInt(c.usuariosMax,10)||1);
+    o.aviso = (c.aviso==null||String(c.aviso).trim()==='') ? null : String(c.aviso).trim();
+    o.aviso_hasta = c.avisoHasta || null;
+    o.bloqueo_manual = !!c.bloqueoManual;
+  }
+  return o;
+}
+function fromNeg(r){
+  return {id:r.id, codigo:r.codigo||'', negocio:r.negocio||'', tipo:r.tipo||'', ciudad:r.ciudad||'',
+    contacto:r.contacto||'', telefono:r.telefono||'', correo:r.correo||'', desde:r.desde||'',
+    planId:r.plan_id||'', precio:(r.precio==null?'':Number(r.precio)), moneda:r.moneda||'',
+    diaCobro:r.dia_cobro||1, estado:r.estado||'activo', modoCorte:r.modo_corte||'auto',
+    gracia:(r.gracia==null?'':Number(r.gracia)), notas:r.notas||'', pagos:[],
+    modulos:(Array.isArray(r.modulos)?r.modulos.map(function(x){ return String(x).toLowerCase(); }):[]),
+    usuariosMax:(r.usuarios_max==null?5:Number(r.usuarios_max)),
+    aviso:r.aviso||'', avisoHasta:(r.aviso_hasta||''), bloqueoManual:!!r.bloqueo_manual};
+}
+function toPago(p,cid){
+  return {id:p.id, negocio_id:cid, periodo:p.periodo||null, fecha:p.fecha||null,
+    monto:Number(p.monto)||0, moneda:p.moneda||null, tasa:Number(p.tasa)||0,
+    monto_base:Number(p.montoBase)||0, metodo:p.metodo||'', ref:p.ref||'', nota:p.nota||'',
+    recibo:p.recibo||'', ts:p.ts||new Date().toISOString()};
+}
+function fromPago(r){
+  return {id:r.id, periodo:r.periodo||'', fecha:r.fecha||'', monto:Number(r.monto)||0,
+    moneda:r.moneda||'', tasa:Number(r.tasa)||0, montoBase:Number(r.monto_base)||0,
+    metodo:r.metodo||'', ref:r.ref||'', nota:r.nota||'', recibo:r.recibo||'', ts:r.ts||''};
+}
+
+/* --- leer todo de la nube --- */
+async function nubeLeer(){
+  var res=await Promise.all([
+    nubeApi('/rest/v1/pc_negocios?select=*&order=creado.asc'),
+    nubeApi('/rest/v1/pc_pagos?select=*&order=fecha.asc'),
+    nubeApi('/rest/v1/pc_planes?select=*'),
+    nubeApi('/rest/v1/pc_monedas?select=*'),
+    nubeApi('/rest/v1/pc_cfg?select=datos')
+  ]);
+  var neg=res[0]||[], pag=res[1]||[], pl=res[2]||[], mo=res[3]||[], cf=res[4]||[];
+  D=datosVacios();
+  if(cf[0] && cf[0].datos){
+    var d=cf[0].datos;
+    if(d.cfg) D.cfg=Object.assign(D.cfg,d.cfg);
+    if(d.seq) D.seq=Object.assign(D.seq,d.seq);
+  }
+  if(mo.length){ D.monedas=mo.map(function(m){ return {cod:m.cod,nom:m.nom||m.cod,sim:m.sim||m.cod,tasa:Number(m.tasa)||0,base:!!m.base}; }); }
+  D.planes=pl.map(function(x){ return {id:x.id,nombre:x.nombre||'',precio:(x.precio==null?'':Number(x.precio)),moneda:x.moneda||base().cod,incluye:x.incluye||''}; });
+  D.clientes=neg.map(fromNeg);
+  pag.forEach(function(r){
+    var c=D.clientes.filter(function(x){ return x.id===r.negocio_id; })[0];
+    if(c){ c.pagos=c.pagos||[]; c.pagos.push(fromPago(r)); }
+  });
+  asegurarBase();
+  NUBE.vacia=(!neg.length && !pl.length && !mo.length);
+}
+
+/* --- subir todo --- */
+function nubeEncolar(){
+  if(!NUBE.listo) return;
+  NUBE.estado='guardando'; pintarNube();
+  clearTimeout(NUBE.timer);
+  NUBE.timer=setTimeout(function(){ nubeEscribir(); }, 900);
+}
+async function nubeUpsert(tabla, filas, conflicto){
+  if(!filas.length) return;
+  await nubeApi('/rest/v1/'+tabla+'?on_conflict='+encodeURIComponent(conflicto), {
+    method:'POST',
+    headers:{'Prefer':'resolution=merge-duplicates,return=minimal'},
+    body:JSON.stringify(filas)
+  });
+}
+async function nubeBorrar(tabla, campo, ids){
+  if(!ids.length) return;
+  await nubeApi('/rest/v1/'+tabla+'?'+campo+'=in.('+ids.map(encodeURIComponent).join(',')+')', {method:'DELETE',headers:{'Prefer':'return=minimal'}});
+}
+function mapaPor(arr,campo){ var o={}; arr.forEach(function(x){ o[String(x[campo])]=1; }); return o; }
+function sobran(antes, ahora){
+  if(!antes) return [];
+  var out=[]; for(var k in antes){ if(!ahora[k]) out.push(k); } return out;
+}
+
+async function nubeEscribir(){
+  if(!NUBE.listo) return;
+  if(NUBE.subiendo){ NUBE.otra=true; return; }
+  NUBE.subiendo=true; NUBE.estado='guardando'; pintarNube();
+  try{
+    var neg=[], pags=[];
+    D.clientes.forEach(function(c){
+      neg.push(toNeg(c));
+      (c.pagos||[]).forEach(function(p){ pags.push(toPago(p,c.id)); });
+    });
+    var planes=D.planes.map(function(p){ return {id:p.id,nombre:p.nombre||'',precio:(p.precio===''||p.precio==null?null:Number(p.precio)),moneda:p.moneda||null,incluye:p.incluye||''}; });
+    var mons=D.monedas.map(function(m){ return {cod:m.cod,nom:m.nom||m.cod,sim:m.sim||m.cod,tasa:Number(m.tasa)||0,base:!!m.base}; });
+
+    var act={neg:mapaPor(neg,'id'), pag:mapaPor(pags,'id'), pl:mapaPor(planes,'id'), mon:mapaPor(mons,'cod')};
+    var del={neg:sobran(NUBE.prev&&NUBE.prev.neg,act.neg), pag:sobran(NUBE.prev&&NUBE.prev.pag,act.pag),
+             pl:sobran(NUBE.prev&&NUBE.prev.pl,act.pl), mon:sobran(NUBE.prev&&NUBE.prev.mon,act.mon)};
+
+    await nubeUpsert('pc_negocios',neg,'owner,id');
+    await nubeUpsert('pc_pagos',pags,'owner,id');
+    await nubeUpsert('pc_planes',planes,'owner,id');
+    await nubeUpsert('pc_monedas',mons,'owner,cod');
+    await nubeUpsert('pc_cfg',[{datos:{cfg:D.cfg,seq:D.seq},actualizado:new Date().toISOString()}],'owner');
+
+    await nubeBorrar('pc_pagos','id',del.pag);
+    await nubeBorrar('pc_negocios','id',del.neg);
+    await nubeBorrar('pc_planes','id',del.pl);
+    await nubeBorrar('pc_monedas','cod',del.mon);
+
+    NUBE.prev=act; NUBE.ultimo=new Date(); NUBE.estado='ok'; NUBE.err='';
+    guardarLocal();
+  }catch(e){
+    NUBE.estado=(navigator.onLine===false)?'off':'error';
+    NUBE.err=String((e&&e.message)||e);
+  }
+  NUBE.subiendo=false; pintarNube();
+  if(NUBE.otra){ NUBE.otra=false; nubeEncolar(); }
+}
+
+/* --- estado visual --- */
+function pintarNube(){
+  var el=document.getElementById('h-cloud');
+  var u=document.getElementById('h-user');
+  if(u){
+    u.innerHTML = (NUBE.ses&&NUBE.ses.email)
+      ? ('<div>'+esc(NUBE.ses.email)+'</div><a href="#" data-act="salir">Salir</a>')
+      : '';
+  }
+  if(!el) return;
+  var txt='Nube', cls='';
+  if(NUBE.estado==='ok'){ txt='Guardado'; cls='ok'; }
+  else if(NUBE.estado==='guardando'){ txt='Guardando…'; cls='warn'; }
+  else if(NUBE.estado==='off'){ txt='Sin conexión'; cls='warn'; }
+  else if(NUBE.estado==='error'){ txt='Sin guardar'; cls='bad'; }
+  el.className='cloud '+cls;
+  var hora = NUBE.ultimo ? (String(NUBE.ultimo.getHours()).padStart(2,'0')+':'+String(NUBE.ultimo.getMinutes()).padStart(2,'0')) : '';
+  el.innerHTML='☁️ <b>'+esc(txt)+(hora?' <span class="h">· '+hora+'</span>':'')+'</b>';
+  el.title = 'Nube: '+txt+(NUBE.err?('\n'+NUBE.err):'')+'\nSe guarda automáticamente en Supabase.';
+}
+
+/* --- entrada y salida --- */
+function loginMsg(id,txt){ var e=document.getElementById(id); if(e) e.textContent=txt||''; }
+function mostrarLogin(paso,msg){
+  var L=document.getElementById('login'); if(!L) return;
+  L.classList.add('on');
+  document.getElementById('lg-setup').hidden = (paso!=='setup');
+  document.getElementById('lg-form').hidden  = (paso==='setup');
+  if(paso==='setup' && NUBE.url){ var a=document.getElementById('l-url'); if(a&&!a.value) a.value=NUBE.url; }
+  if(msg) loginMsg(paso==='setup'?'lg-msg1':'lg-msg2', msg);
+  var m=document.getElementById('l-mail'); if(m && !m.value){ var g=localStorage.getItem('pc_mail')||''; if(g) m.value=g; }
+  setTimeout(function(){ var f=document.getElementById(paso==='setup'?'l-url':'l-mail'); if(f) try{ f.focus(); }catch(e){} },120);
+}
+function ocultarLogin(){ var L=document.getElementById('login'); if(L) L.classList.remove('on'); }
+
+async function entrarAlPanel(email,pass){
+  var b=document.getElementById('lg-entrar');
+  if(b){ b.disabled=true; b.textContent='Entrando…'; }
+  loginMsg('lg-msg2','');
+  try{
+    sesGuardar(await authEntrar(email,pass));
+    try{ localStorage.setItem('pc_mail',email); }catch(e){}
+    await arrancarNube();
+    ocultarLogin(); render(); toast('Bienvenido');
+  }catch(e){
+    var m=String((e&&e.message)||e);
+    loginMsg('lg-msg2', (/invalid|grant|credentials|400/i.test(m)) ? 'Correo o clave incorrectos. Revísalos y vuelve a intentar.' : ('No se pudo entrar. '+m));
+  }finally{
+    if(b){ b.disabled=false; b.textContent='Entrar al panel'; }
+  }
+}
+function guardarConexion(){
+  var u=(document.getElementById('l-url')||{}).value||'';
+  var k=(document.getElementById('l-key')||{}).value||'';
+  u=String(u).trim(); k=String(k).trim();
+  u=limpiarUrl(u); k=limpiarClave(k);
+  if(!/^https?:\/\//i.test(u)){ loginMsg('lg-msg1','La dirección debe empezar por https://'); return; }
+  if(!/\.supabase\.co$/i.test(u) && !/^https?:\/\/(127\.0\.0\.1|localhost)/i.test(u)){ loginMsg('lg-msg1','Esa no parece la dirección del proyecto. Debe terminar en .supabase.co (sin /rest/v1/ al final).'); return; }
+  if(k.length<30){ loginMsg('lg-msg1','Esa clave parece incompleta. Copia la clave pública completa (empieza con sb_publishable_ o con eyJ).'); return; }
+  supaCfgGuardar(u,k);
+  loginMsg('lg-msg1','');
+  mostrarLogin('login');
+}
+function salirDelPanel(){
+  if(!confirm('¿Cerrar la sesión del panel en este equipo?\n\nTus datos quedan guardados en la nube.')) return;
+  sesBorrar(); NUBE.listo=false; location.reload();
+}
+
+async function arrancarNube(){
+  var antes=null;
+  try{ antes=JSON.parse(JSON.stringify(D)); }catch(e){}
+  await nubeLeer();
+  await probarLicencia();
+  var migrar=false;
+  if(!localStorage.getItem(PC_MIG) && antes && (antes.clientes.length||antes.planes.length)){
+    var traer=false;
+    (antes.clientes||[]).forEach(function(c){
+      var ya=D.clientes.filter(function(x){ return x.id===c.id; })[0];
+      if(!ya){ D.clientes.push(c); traer=true; }
+    });
+    (antes.planes||[]).forEach(function(p){
+      var ya=D.planes.filter(function(x){ return x.id===p.id; })[0];
+      if(!ya){ D.planes.push(p); traer=true; }
+    });
+    (antes.monedas||[]).forEach(function(m){
+      if(!D.monedas.filter(function(x){ return x.cod===m.cod; })[0]){ D.monedas.push(m); traer=true; }
+    });
+    if((!D.cfg || !D.cfg.empresa) && antes.cfg && antes.cfg.empresa){ D.cfg=Object.assign({},D.cfg,antes.cfg); traer=true; }
+    if(antes.seq && antes.seq.recibo && (!D.seq || !D.seq.recibo || antes.seq.recibo>D.seq.recibo)){ D.seq=Object.assign({},D.seq,antes.seq); traer=true; }
+    migrar=traer;
+    try{ localStorage.setItem(PC_MIG,'1'); }catch(e){}
+  }
+  NUBE.listo=true;
+  var codsNuevos=asegurarCodigos();
+  NUBE.prev={neg:mapaPor(D.clientes,'id'), pag:mapaPor([].concat.apply([],D.clientes.map(function(c){return c.pagos||[];})),'id'),
+             pl:mapaPor(D.planes,'id'), mon:mapaPor(D.monedas,'cod')};
+  if(migrar || codsNuevos || NUBE.vacia){ await nubeEscribir(); }
+  else { NUBE.estado='ok'; pintarNube(); }
 }
 
 /* ---------- utilidades ---------- */
@@ -536,6 +953,110 @@ function estadoDe(c, per){
 }
 function activo(c){ return c.estado!=='suspendido'; }
 
+/* =====================================================================
+   LICENCIA DE LA APP
+   El codigo es la llave que escribe el negocio al abrir su app.
+   La fecha de vencimiento se calcula igual que en la nube:
+   primer dia del mes siguiente al ultimo mes pagado + el dia de cobro,
+   y despues los dias de gracia (3 por defecto).
+   ===================================================================== */
+var MODULOS_APP=[['recepcion','Recepción'],['supervision','Supervisión'],['ama','Ama de Llaves'],
+                 ['mantenimiento','Mantenimiento'],['comidas','Comidas'],['reportes','Reportes']];
+
+function limpiarCodigo(t){
+  var s=String(t==null?'':t);
+  try{ s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); }catch(e){}
+  return s.toUpperCase().replace(/[^A-Z0-9]+/g,'').slice(0,16);
+}
+function codigoExiste(cod, exceptoId){
+  var k=String(cod||'').trim().toUpperCase();
+  if(!k) return false;
+  return D.clientes.some(function(c){ return c.id!==exceptoId && String(c.codigo||'').trim().toUpperCase()===k; });
+}
+function codigoNuevo(nombre, exceptoId){
+  var b=limpiarCodigo(nombre)||'NEGOCIO';
+  if(b.length<3) b=(b+'NEGOCIO').slice(0,8);
+  if(!codigoExiste(b, exceptoId)) return b;
+  for(var i=2;i<99;i++){
+    var suf='-'+i, cand=b.slice(0,16-suf.length)+suf;
+    if(!codigoExiste(cand, exceptoId)) return cand;
+  }
+  return b.slice(0,10)+'-'+String(Date.now()).slice(-5);
+}
+function asegurarCodigos(){
+  var hubo=false;
+  (D.clientes||[]).forEach(function(c){
+    if(!String(c.codigo||'').trim()){ c.codigo=codigoNuevo(c.negocio, c.id); hubo=true; }
+    if(!Array.isArray(c.modulos)) c.modulos=[];
+    if(c.usuariosMax==null || c.usuariosMax==='') c.usuariosMax=5;
+    if(c.aviso==null) c.aviso='';
+    if(c.avisoHasta==null) c.avisoHasta='';
+    c.bloqueoManual=!!c.bloqueoManual;
+  });
+  if(hubo) guardarLocal();
+  return hubo;
+}
+function graciaLic(c){
+  var g=parseInt(c.gracia,10);
+  return (isFinite(g) && g>=0 && g<=30) ? g : 3;
+}
+function licenciaDe(c){
+  var g=graciaLic(c), per=null;
+  (c.pagos||[]).forEach(function(p){
+    var x=String(p.periodo||'');
+    if(/^[0-9]{4}-[0-9]{2}$/.test(x) && (!per || x>per)) per=x;
+  });
+  var basePer = per || String(c.desde||hoyISO()).slice(0,7);
+  if(!/^[0-9]{4}-[0-9]{2}$/.test(basePer)) basePer=periodoActual();
+  var y=parseInt(basePer.slice(0,4),10), m=parseInt(basePer.slice(5,7),10);
+  var dia=Math.min(Math.max(parseInt(c.diaCobro,10)||1,1),28);
+  var vence=new Date(y,m,1); vence.setHours(0,0,0,0); vence.setDate(vence.getDate()+dia-1);
+  var hoy=new Date(); hoy.setHours(0,0,0,0);
+  var lim=new Date(vence.getTime()+g*86400000);
+  var k;
+  if(c.bloqueoManual) k='bloqueado';
+  else if(c.estado==='suspendido') k='bloqueado';
+  else if(c.estado==='prueba') k='prueba';
+  else if(hoy<vence) k='activo';
+  else if(hoy<=lim) k='gracia';
+  else k='bloqueado';
+  var dias=Math.round((lim.getTime()-hoy.getTime())/86400000); if(dias<0) dias=0;
+  return {k:k, vence:vence, gracia:g, dias:dias, periodo:per,
+    txt:{activo:'Activa',gracia:'En gracia',bloqueado:'Bloqueada',prueba:'En prueba'}[k],
+    cls:{activo:'bg-ok',gracia:'bg-warn',bloqueado:'bg-bad',prueba:'bg-off'}[k]};
+}
+function fechaD(d){ return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+function modulosTxt(c){
+  var arr=(c.modulos||[]).map(function(k){
+    var f=MODULOS_APP.filter(function(x){ return x[0]===k; })[0];
+    return f?f[1]:k;
+  });
+  return arr.length?arr.join(' · '):'Sin módulos asignados';
+}
+function copiarCodigo(txt){
+  var t=String(txt||'').trim(); if(!t) return;
+  function final(){ toast('Código copiado: '+t); }
+  function manual(){
+    var a=document.createElement('textarea'); a.value=t; a.style.position='fixed'; a.style.opacity='0';
+    document.body.appendChild(a); a.select();
+    try{ document.execCommand('copy'); final(); }catch(e){ toast('El código es '+t); }
+    a.remove();
+  }
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(final, manual); return;
+    }
+  }catch(e){}
+  manual();
+}
+async function probarLicencia(){
+  try{
+    await nubeApi('/rest/v1/pc_negocios?select=modulos,usuarios_max,aviso,aviso_hasta,bloqueo_manual&limit=1');
+    NUBE.lic=true;
+  }catch(e){ NUBE.lic=false; }
+  return NUBE.lic;
+}
+
 /* ---------- pestañas, tema y cabecera ---------- */
 var TABSEL='panel';
 var PLANTILLA_WAPP='Hola {contacto}, le escribo de {empresa}. Le recuerdo la mensualidad de {mes} de {negocio}: {monto}{pendiente}. ¡Gracias!';
@@ -568,6 +1089,7 @@ function pintarCabecera(){
   if(st) st.innerHTML='<b>'+activos+'</b> negocio'+(activos===1?'':'s')+' activo'+(activos===1?'':'s')
       +(venc?(' · <b style="color:#ffb0bd">'+venc+'</b> vencido'+(venc===1?'':'s')):'')+'<br>'+mesTxt(PER);
   var vr=document.getElementById('h-ver'); if(vr) vr.textContent=PC_VERSION;
+  pintarNube();
 
   function item(tab,ic,lbl,sub,badge){
     var al=(badge>0);
@@ -617,6 +1139,12 @@ function render(){
   function conAlt(x){ return alt ? (' <span class="mini">≈ '+fmt(deBase(x, alt.cod), alt.cod)+'</span>') : ''; }
 
   var h='';
+  /* aviso si falta correr la etapa 2 en la nube */
+  if(!NUBE.lic && NUBE.listo){
+    h+='<div class="nota alerta" style="margin-bottom:12px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap">'
+      + '<span>Las <b>licencias</b> todavía no están activas en la nube. Corre una vez el archivo <b>supabase-etapa2.sql</b> en Supabase y toca el botón. Mientras tanto, el código y los módulos se guardan solo en este equipo.</span>'
+      + '<button class="b-ghost b-sm" data-act="probarLic">✅ Ya lo corrí</button></div>';
+  }
   /* aviso si falta la tasa */
   if(alt===undefined && D.monedas.filter(function(m){ return !m.base; }).length){
     h+='<div class="nota alerta" style="margin-bottom:12px">Falta cargar la tasa de una moneda. Toca <b>💱 Monedas</b> y escribe cuánto vale 1 '+esc(bcod)+' en esa moneda.</div>';
@@ -676,7 +1204,7 @@ function render(){
   /* lista de clientes */
   var lista = cliTodas.filter(function(c){
     if(!Q) return true;
-    var t=[c.negocio,c.ciudad,c.telefono,c.tipo,c.notas].join(' ').toUpperCase();
+    var t=[c.negocio,c.ciudad,c.telefono,c.tipo,c.negocio,c.codigo,c.notas].join(' ').toUpperCase();
     return t.indexOf(Q.toUpperCase())>=0;
   });
   lista.sort(function(a,b){
@@ -710,6 +1238,15 @@ function tarjetaCliente(c){
   h+='<div class="cli-h"><div><div class="cli-n">'+esc(c.negocio)+'</div>'
     +'<div class="cli-t"><span class="tag">'+esc(c.tipo||'Negocio')+'</span> '+esc(c.ciudad||'')+'</div></div>'
     +'<span class="badge '+e.cls+'">'+esc(e.txt)+'</span></div>';
+  var L=licenciaDe(c);
+  h+='<div class="lic">'
+    +(c.codigo
+      ? '<span class="codechip" data-act="copiarCodigo" data-cod="'+esc(c.codigo)+'" title="Toca para copiar el código y dárselo al cliente">🔑 '+esc(c.codigo)+'</span>'
+      : '<span class="codechip sin" title="Entra en Licencia para crear el código">🔑 sin código</span>')
+    +'<span class="badge '+L.cls+'">App '+esc(L.txt)+'</span>'
+    +'<span>vence <b>'+fechaD(L.vence)+'</b>'+(L.k==='gracia'?(' · '+L.dias+' día(s) de gracia'):'')+'</span>'
+    +'<span>👥 <b>'+esc(String(c.usuariosMax||5))+'</b> usuarios · <b>'+((c.modulos||[]).length)+'/'+MODULOS_APP.length+'</b> módulos</span>'
+    +'</div>';
   h+='<div class="cli-d">'
     +'<span>Plan: <b>'+esc(planNombre(c.planId))+'</b></span>'
     +'<span>Mensualidad: <b>'+mTxt+'</b></span>'
@@ -726,6 +1263,7 @@ function tarjetaCliente(c){
   h+='<div class="cli-a">'
     +'<button class="b-ghost b-sm" data-act="ficha" data-id="'+esc(c.id)+'">Ver ficha</button>'
     +'<button class="b-ok b-sm" data-act="pago" data-id="'+esc(c.id)+'">💵 Registrar pago</button>'
+    +'<button class="b-ghost b-sm" data-act="licencia" data-id="'+esc(c.id)+'">🔑 Licencia</button>'
     +(c.telefono?('<button class="b-ghost b-sm" data-act="wapp" data-id="'+esc(c.id)+'">💬 Recordar</button>'):'')
     +'</div></div>';
   return h;
@@ -784,6 +1322,19 @@ function verFicha(id){
   }
   if(c.notas){ h+='<div class="nota" style="margin-bottom:10px"><b>Notas:</b> '+esc(c.notas)+'</div>'; }
 
+  /* licencia de la app */
+  var L=licenciaDe(c);
+  h+='<div style="font-weight:800;color:#a7b5d3;font-size:11px;text-transform:uppercase;letter-spacing:.9px;margin:12px 0 6px">Licencia de la app</div>';
+  h+='<div class="licbox">'
+    +'<div class="row"><span>Código con que entra</span><b>'+(c.codigo?('<span class="codechip" data-act="copiarCodigo" data-cod="'+esc(c.codigo)+'">🔑 '+esc(c.codigo)+'</span>'):'<span class="codechip sin">sin código</span>')+'</b></div>'
+    +'<div class="row"><span>Estado</span><b><span class="badge '+L.cls+'">'+esc(L.txt)+'</span></b></div>'
+    +'<div class="row"><span>Vence</span><b>'+fechaD(L.vence)+'</b></div>'
+    +'<div class="row"><span>Días de gracia</span><b>'+L.gracia+' día(s)</b></div>'
+    +'<div class="row"><span>Usuarios permitidos</span><b>'+esc(String(c.usuariosMax||5))+'</b></div>'
+    +'<div class="row"><span>Módulos</span><b style="text-align:right;max-width:62%">'+esc(modulosTxt(c))+'</b></div>'
+    +(c.aviso?('<div class="row"><span>Aviso</span><b style="text-align:right;max-width:62%">'+esc(c.aviso)+(c.avisoHasta?(' · hasta '+fechaCorta(c.avisoHasta)):'')+'</b></div>'):'')
+    +'</div>';
+
   /* pagos */
   var pagos=(c.pagos||[]).slice().sort(function(a,b){ return String(b.periodo).localeCompare(String(a.periodo)) || String(b.fecha).localeCompare(String(a.fecha)); });
   h+='<div style="font-weight:800;color:#a7b5d3;font-size:11px;text-transform:uppercase;letter-spacing:.9px;margin:12px 0 6px">Pagos recibidos ('+pagos.length+')</div>';
@@ -801,6 +1352,7 @@ function verFicha(id){
   h+='<div class="acciones">'
     +'<button class="b-ok" data-act="pago" data-id="'+esc(c.id)+'">💵 Registrar pago</button>'
     +'<button class="b-ghost" data-act="editar" data-id="'+esc(c.id)+'">✏️ Editar</button>'
+    +'<button class="b-ghost" data-act="licencia" data-id="'+esc(c.id)+'">🔑 Licencia</button>'
     +'<button class="b-ghost" data-act="estadoCuenta" data-id="'+esc(c.id)+'">🖨️ Estado de cuenta</button>'
     +(c.estado==='suspendido'
         ? '<button class="b-ghost" data-act="reactivar" data-id="'+esc(c.id)+'">▶️ Reactivar</button>'
@@ -808,6 +1360,97 @@ function verFicha(id){
     +'<button class="b-ghost" data-act="cerrar">Cerrar</button>'
     +'</div>';
   abrirModal(h);
+}
+
+/* ---------- licencia de la app ---------- */
+var LIC_CTX=null;
+function formLicencia(id){
+  var c=D.clientes.filter(function(x){ return x.id===id; })[0]; if(!c) return;
+  var L=licenciaDe(c);
+  var mods=c.modulos||[];
+  var h='<h2>🔑 Licencia de la app</h2>';
+  h+='<div class="msub">'+esc(c.negocio)+' · aquí defines con qué código entra, qué módulos ve y cuándo se le bloquea</div>';
+  if(!NUBE.lic){
+    h+='<div class="nota alerta" style="margin-bottom:10px">Todavía no corriste <b>supabase-etapa2.sql</b> en Supabase: lo que guardes ahora queda solo en este equipo.</div>';
+  }
+  h+='<div class="licbox">'
+    +'<div class="row"><span>Último mes pagado</span><b>'+(L.periodo?esc(mesTxt(L.periodo)):'— sin pagos —')+'</b></div>'
+    +'<div class="row"><span>Vence</span><b>'+fechaD(L.vence)+'</b></div>'
+    +'<div class="row"><span>Estado hoy</span><b><span class="badge '+L.cls+'">'+esc(L.txt)+'</span></b></div>'
+    +'</div>';
+  h+='<div class="field"><label>Código para entrar a la app</label><input id="li-codigo" maxlength="16" value="'+esc(c.codigo||'')+'" placeholder="Ej: HOTELJARA" style="text-transform:uppercase;letter-spacing:1.5px;font-weight:800" spellcheck="false" autocomplete="off"></div>';
+  h+='<div class="mini" style="margin:-4px 0 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span>Es la llave que el negocio escribe al abrir su app. Solo letras y números, sin espacios.</span>'
+    +'<button class="b-ghost b-sm" data-act="licAzar" data-id="'+esc(c.id)+'">🎲 Generar otro</button></div>';
+  h+='<div class="field" style="margin-bottom:6px"><label>Módulos que tiene activos</label></div><div class="mods">'
+    + MODULOS_APP.map(function(m){
+        return '<label class="mod"><input type="checkbox" data-mod="'+m[0]+'"'+(mods.indexOf(m[0])>=0?' checked':'')+'> '+esc(m[1])+'</label>';
+      }).join('')
+    +'</div>';
+  h+='<div class="mini" style="margin:2px 0 12px">Lo que dejes sin marcar no le aparece en la app. '
+    +'<button class="b-ghost b-sm" data-act="licTodos">Marcar todos</button></div>';
+  h+='<div class="row2"><div class="field"><label>Usuarios permitidos</label><input id="li-usuarios" type="number" min="1" max="99" value="'+esc(String(c.usuariosMax||5))+'" inputmode="numeric"></div>'
+    +'<div class="field"><label>Días de gracia</label><input id="li-gracia" type="number" min="0" max="30" value="'+L.gracia+'" inputmode="numeric"></div></div>';
+  h+='<div class="mini" style="margin:-4px 0 12px">Los días de gracia son los que aguanta la app después del vencimiento antes de bloquearse. Por defecto 3.</div>';
+  h+='<div class="field"><label>Aviso dentro de la app (opcional)</label><textarea id="li-aviso" rows="2" maxlength="200" placeholder="Ej: Su mensualidad está por vencer, pase por administración.">'+esc(c.aviso||'')+'</textarea></div>';
+  h+='<div class="field" style="margin-bottom:6px"><label>Mostrar el aviso hasta</label><input id="li-avisoHasta" type="date" value="'+esc(String(c.avisoHasta||'').slice(0,10))+'"></div>';
+  h+='<div class="mini" style="margin:-4px 0 12px">Si dejas la fecha vacía, el aviso se le muestra siempre. Si la fecha ya pasó, el aviso deja de verse solo.</div>';
+  h+='<label class="mod" style="margin-bottom:6px"><input type="checkbox" id="li-bloq"'+(c.bloqueoManual?' checked':'')+'> Bloquear la app ahora (aunque esté al día)</label>';
+  h+='<div class="mini" style="margin-bottom:12px">Úsalo cuando quieras cortarle el servicio de una vez. Al desmarcarlo vuelve a la regla normal de pagos.</div>';
+  h+='<div class="licbox" id="li-prev"></div>';
+  h+='<div class="acciones"><button class="b-primary" data-act="licGuardar" data-id="'+esc(c.id)+'">💾 Guardar licencia</button>'
+    +'<button class="b-ghost" data-act="cerrar">Cancelar</button></div>';
+  LIC_CTX={id:c.id, pagos:(c.pagos||[]).slice(), desde:c.desde||'', diaCobro:(parseInt(c.diaCobro,10)||1), estado:c.estado||'activo'};
+  abrirModal(h);
+  setTimeout(licPreview,0);
+}
+function licPreview(){
+  var out=document.getElementById('li-prev'); if(!out||!LIC_CTX) return;
+  var gN=parseInt((document.getElementById('li-gracia')||{}).value,10);
+  var tmp={pagos:LIC_CTX.pagos, desde:LIC_CTX.desde, diaCobro:LIC_CTX.diaCobro,
+           gracia:(isFinite(gN)?gN:3), estado:LIC_CTX.estado,
+           bloqueoManual:((document.getElementById('li-bloq')||{}).checked===true)};
+  var L=licenciaDe(tmp);
+  var det = L.k==='activo' ? ('Le quedan '+L.dias+' día(s) de servicio')
+          : L.k==='gracia' ? ('Está en gracia: le quedan '+L.dias+' día(s) antes de bloquearse')
+          : L.k==='prueba' ? 'En prueba: no se le bloquea ni se le cobra'
+          : 'La app se le bloquea al abrir';
+  out.innerHTML='<div class="row"><span>Con estos datos</span><b><span class="badge '+L.cls+'">'+esc(L.txt)+'</span></b></div>'
+    +'<div class="row"><span>Vence</span><b>'+fechaD(L.vence)+'</b></div>'
+    +'<div class="row"><span>Detalle</span><b style="text-align:right;max-width:62%">'+esc(det)+'</b></div>';
+}
+function licAzar(id){
+  var el=document.getElementById('li-codigo'); if(!el) return;
+  var c=D.clientes.filter(function(x){ return x.id===id; })[0]||{};
+  var b=limpiarCodigo(c.negocio||el.value||'NEGOCIO'); if(b.length<3) b='NEGOCIO';
+  var cur=limpiarCodigo(el.value);
+  var cand=b, i=2;
+  while((codigoExiste(cand,id) || cand===cur) && i<99){ cand=b.slice(0,14)+'-'+i; i++; }
+  el.value=cand; licPreview();
+}
+function licTodos(){
+  var ins=document.querySelectorAll('#modal-box .mods input[data-mod]');
+  var todos=true;
+  for(var i=0;i<ins.length;i++){ if(!ins[i].checked){ todos=false; break; } }
+  for(var j=0;j<ins.length;j++){ ins[j].checked=!todos; }
+  toast(todos?'Módulos desmarcados':'Todos los módulos marcados');
+}
+function guardarLicencia(id){
+  var c=D.clientes.filter(function(x){ return x.id===id; })[0]; if(!c){ alert('No se encontró el negocio.'); return; }
+  var g=function(x){ var e=document.getElementById(x); return e?String(e.value==null?'':e.value):''; };
+  var cod=limpiarCodigo(g('li-codigo'));
+  if(cod.length<3){ alert('El código debe tener al menos 3 letras o números. Ejemplo: HOTELJARA'); return; }
+  if(codigoExiste(cod,id)){ alert('Ese código ya lo usa otro negocio. Prueba otro, por ejemplo '+cod+'2.'); return; }
+  var mods=[];
+  var ins=document.querySelectorAll('#modal-box .mods input[data-mod]');
+  for(var i=0;i<ins.length;i++){ if(ins[i].checked) mods.push(ins[i].getAttribute('data-mod')); }
+  var u=parseInt(g('li-usuarios'),10); if(!isFinite(u)||u<1) u=1; if(u>99) u=99;
+  var gr=parseInt(g('li-gracia'),10); if(!isFinite(gr)||gr<0) gr=3; if(gr>30) gr=30;
+  c.codigo=cod; c.modulos=mods; c.usuariosMax=u; c.gracia=gr;
+  c.aviso=String(g('li-aviso')||'').trim();
+  c.avisoHasta=String(g('li-avisoHasta')||'').trim();
+  c.bloqueoManual=((document.getElementById('li-bloq')||{}).checked===true);
+  guardar(); cerrarModal(); render();
+  toast('Licencia guardada · código '+cod);
 }
 
 /* ---------- formulario cliente ---------- */
@@ -865,11 +1508,16 @@ function guardarCliente(id, esNuevo){
   };
   if(esNuevo){
     obj.id=id; obj.pagos=[];
+    obj.codigo=codigoNuevo(negocio);
+    obj.modulos=MODULOS_APP.map(function(m){ return m[0]; });
+    obj.usuariosMax=5; obj.aviso=''; obj.avisoHasta=''; obj.bloqueoManual=false;
+    if(obj.gracia==null || obj.gracia==='') obj.gracia=3;
     D.clientes.push(obj);
   } else {
     var c=D.clientes.filter(function(x){ return x.id===id; })[0];
     if(!c){ alert('No se encontró el cliente.'); return; }
     Object.keys(obj).forEach(function(k){ c[k]=obj[k]; });
+    if(!String(c.codigo||'').trim()) c.codigo=codigoNuevo(negocio, id);
   }
   guardar(); cerrarModal(); render();
   toast(esNuevo?'Cliente anotado':'Cliente actualizado');
@@ -1330,6 +1978,28 @@ function renderCfg(){
     + '</div><div class="mini" style="margin-top:8px">Los planes que le ofreces a cada negocio y las monedas con su tasa del día.</div>';
   h+=cfgSec('💳','Planes y monedas','Lo que cobras y en qué moneda',b7);
 
+  /* nube */
+  var b8='<div class="chips">'
+    + '<button class="b-ghost b-sm" data-act="syncNow">🔄 Guardar ahora en la nube</button>'
+    + '<button class="b-ghost b-sm" data-act="lgCambiar">🔑 Cambiar conexión</button>'
+    + '<button class="b-ghost b-sm" data-act="salir">🚪 Cerrar sesión</button>'
+    + '</div><div class="mini" style="margin-top:8px">Sesión: <b>'+esc(NUBE.ses&&NUBE.ses.email?NUBE.ses.email:'—')+'</b>. Todo lo que cambias se guarda solo en tu cuenta de forma segura. Si te quedas sin internet puedes seguir viendo los datos, pero no se guardarán hasta que vuelvas a conectarte.</div>';
+  h+=cfgSec('☁️','Conexión con la nube','Tu cuenta y la sincronización',b8);
+
+  /* instalar en los equipos */
+  var enWeb=/^https?:/.test(location.protocol);
+  var b9='<div class="chips">'
+    + (enWeb?'<button class="b-primary" data-act="instalar">📲 Instalar en este equipo</button>':'<button class="b-primary" data-act="instalar">📲 Cómo instalarlo</button>')
+    + '</div>'
+    + '<div class="mini" style="margin-top:8px">'
+    +   '<b>Compu (Chrome o Edge):</b> aparece un ícono de instalar al final de la barra de direcciones, o en el menú ⋮ → <b>Instalar Panel de clientes</b>. Queda con su ícono en el escritorio, como cualquier programa.<br>'
+    +   '<b>Android:</b> menú ⋮ → <b>Instalar aplicación</b> (o “Añadir a pantalla de inicio”).<br>'
+    +   '<b>iPhone o iPad:</b> ábrelo en <b>Safari</b> → botón <b>Compartir</b> → <b>Añadir a pantalla de inicio</b>.'
+    + '</div>'
+    + '<div class="mini">Es el mismo panel y la misma cuenta en todos los equipos. Instalado se abre a pantalla completa, sin barra del navegador. Entra desde <b>un equipo a la vez</b>: si lo abres en dos, el último que guarde manda.'
+    + (enWeb?'':' <b>Ojo:</b> esto hay que abrirlo desde su dirección en internet, no desde la carpeta de tu compu.')+'</div>';
+  h+=cfgSec('📲','Instalar en tus equipos','En la compu, la tablet y el teléfono',b9);
+
   /* zona peligrosa */
   var b8='<div class="chips">'
     + '<button class="b-danger b-fill" data-act="cfgBorrar">🗑️ Borrar todos los negocios</button>'
@@ -1403,6 +2073,10 @@ document.addEventListener('click', function(ev){
       TABSEL = (t.getAttribute('data-tab')==='cfg') ? 'cfg' : 'panel';
       cerrarMenu(); render(); break;
     case 'sideToggle': alternarMenu(); break;
+    case 'salir': salirDelPanel(); break;
+    case 'syncNow': nubeEscribir().then(function(){ toast(NUBE.estado==='ok'?'Guardado en la nube':(NUBE.estado==='off'?'Sin conexión: se guardará al volver':'No se pudo guardar')); }); break;
+    case 'lgConexion': guardarConexion(); break;
+    case 'lgCambiar': mostrarLogin('setup'); break;
     case 'sideClose': cerrarMenu(); break;
     case 'tema':
       if(document.getElementById('c-panel')) recogerCfg();
@@ -1446,6 +2120,16 @@ document.addEventListener('click', function(ev){
     case 'estadoCuenta': imprimirEstadoCuenta(id); break;
     case 'cobrosMes': imprimirCobros(); break;
     case 'recibo': imprimirRecibo(t.getAttribute('data-cli'), t.getAttribute('data-pago')); break;
+    case 'instalar': instalarApp(); break;
+    case 'licencia': formLicencia(id); break;
+    case 'licGuardar': guardarLicencia(id); break;
+    case 'licAzar': licAzar(id); break;
+    case 'licTodos': licTodos(); break;
+    case 'copiarCodigo': copiarCodigo(t.getAttribute('data-cod')); break;
+    case 'probarLic': probarLicencia().then(function(ok){
+        if(ok){ toast('Licencias activas · guardando en la nube'); nubeEscribir(); render(); }
+        else { toast('Todavía no: revisa que el SQL haya corrido completo'); }
+      }); break;
   }
 });
 document.addEventListener('input', function(ev){
@@ -1453,9 +2137,11 @@ document.addEventListener('input', function(ev){
   if(!el) return;
   if(el.id==='q'){ Q=String(el.value||''); var pos=el.selectionStart; render(); var n=document.getElementById('q'); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(e){} } return; }
   if(el.id==='p-monto'||el.id==='p-moneda'){ actualizarConv(); }
+  if(el.id==='li-gracia'){ licPreview(); }
 });
 document.addEventListener('change', function(ev){
   var el=ev.target; if(!el) return;
+  if(el.id==='li-bloq'){ licPreview(); }
   if(el.id==='p-moneda'){
     var mo=document.getElementById('p-monto');
     if(mo && PAGO_CTX){
@@ -1475,13 +2161,74 @@ document.addEventListener('keydown', function(ev){
 });
 
 /* ---------- arranque ---------- */
-function inicio(){
+async function inicio(){
   cargar();
   aplicarTema();
   aplicarMenu();
+  var hay=supaCfgLeer();
+  if(!hay && PC_SUPA_DEF.url){
+    supaCfgGuardar(PC_SUPA_DEF.url, PC_SUPA_DEF.key);
+    hay=supaCfgLeer();
+  }
+  if(!hay){ render(); mostrarLogin('setup'); return; }
+  var ses=sesLeer();
+  if(!ses){ render(); mostrarLogin('login'); return; }
+  try{
+    await arrancarNube();
+    ocultarLogin();
+  }catch(e){
+    var m=String((e&&e.message)||e);
+    if(m.indexOf('401')===0 || /JWT|token/i.test(m)){
+      sesBorrar(); NUBE.listo=false;
+      render(); mostrarLogin('login','Tu sesión venció. Entra otra vez.');
+      return;
+    }
+    NUBE.estado='off'; NUBE.err=m;
+    ocultarLogin();
+    toast('Sin conexión: estás viendo lo último guardado en este equipo');
+  }
   render();
 }
-document.addEventListener('DOMContentLoaded', inicio);
+document.addEventListener('submit', function(ev){
+  var f=ev.target;
+  if(f && f.id==='lg-form'){
+    ev.preventDefault();
+    var mail=String((document.getElementById('l-mail')||{}).value||'').trim();
+    var pass=String((document.getElementById('l-pass')||{}).value||'');
+    if(!mail || !pass){ loginMsg('lg-msg2','Escribe tu correo y tu clave.'); return; }
+    entrarAlPanel(mail,pass);
+  }
+});
+window.addEventListener('online', function(){ if(NUBE.listo){ toast('Volvió la conexión'); nubeEscribir(); } });
+window.addEventListener('offline', function(){ if(NUBE.listo){ NUBE.estado='off'; pintarNube(); } });
+/* ---- instalar en el equipo (app instalable) ---- */
+var PCINST={ev:null};
+window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); PCINST.ev=e; });
+window.addEventListener('appinstalled', function(){ PCINST.ev=null; try{ setTimeout(function(){ toast('Listo, ya quedó instalado'); },300); }catch(_){} });
+function instalarApp(){
+  if(!/^https?:/.test(location.protocol)){
+    alert('Esto se instala solo desde su dirección en internet, no desde la carpeta de tu compu.\n\nPrimero hay que subir el panel a su página y abrirlo desde ese enlace.');
+    return;
+  }
+  if(PCINST.ev && PCINST.ev.prompt){
+    try{ PCINST.ev.prompt(); }catch(_){}
+    try{ PCINST.ev.userChoice.then(function(){ PCINST.ev=null; }); }catch(_){ PCINST.ev=null; }
+    return;
+  }
+  var ua=navigator.userAgent||'';
+  var ios=/iPad|iPhone|iPod/.test(ua) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  if(ios){
+    alert('En iPhone o iPad:\n\n1) Abre esta página en Safari.\n2) Toca el botón Compartir (el cuadrito con la flecha).\n3) Baja y toca "Añadir a pantalla de inicio".\n4) Toca "Añadir".\n\nListo: queda el ícono como una app.');
+  } else {
+    alert('Para instalarlo:\n\n• Compu (Chrome o Edge): busca el ícono de instalar al final de la barra de direcciones, o menú ⋮ → "Instalar Panel de clientes".\n• Android: menú ⋮ → "Instalar aplicación".\n\nSi no aparece, recarga la página una vez y vuelve a mirar.');
+  }
+}
+try{
+  if('serviceWorker' in navigator && /^https?:/.test(location.protocol)){
+    window.addEventListener('load', function(){ navigator.serviceWorker.register('./sw.js').catch(function(){}); });
+  }
+}catch(_){}
+
 if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', inicio); } else { inicio(); }
 </script>
 </body>
