@@ -491,12 +491,12 @@ body[data-side="mini"] .sbadge{
 <script>
 /* =======================================================================
    PANEL DE CLIENTES · control de negocios y mensualidades
-   - Todo se guarda en este navegador (localStorage). No toca los datos
-     de la app del hotel ni ninguna caja.
+   - La copia del panel se guarda en este navegador (localStorage).
+   - El acceso Master actualiza solo usuarios del negocio autorizado.
    - Multimoneda: el dólar es la base y cada moneda lleva su tasa.
    - Planes y monedas los crea y edita el dueño del panel.
    ======================================================================= */
-var PC_VERSION = 'v3.3 · 21/11/2026';
+var PC_VERSION = 'v3.4 · 23/11/2026';
 var PC_KEY = 'panelClientes_v1';
 var PC_SUPA = 'pc_supa_cfg';
 var PC_SES  = 'pc_sesion';
@@ -1293,6 +1293,8 @@ function tarjetaCliente(c){
     +'<button class="b-ghost b-sm" data-act="ficha" data-id="'+esc(c.id)+'">Ver ficha</button>'
     +'<button class="b-ok b-sm" data-act="pago" data-id="'+esc(c.id)+'">💵 Registrar pago</button>'
     +'<button class="b-ghost b-sm" data-act="licencia" data-id="'+esc(c.id)+'">🔑 Licencia</button>'
+    +'<button class="b-ghost b-sm" data-act="masterCliente" data-id="'+esc(c.id)+'">🔐 Master</button>'
+    +'<button class="b-danger b-sm" data-act="clienteBorrar" data-id="'+esc(c.id)+'">🗑️ Borrar</button>'
     +(c.telefono?('<button class="b-ghost b-sm" data-act="wapp" data-id="'+esc(c.id)+'">💬 Recordar</button>'):'')
     +'</div></div>';
   return h;
@@ -1323,6 +1325,7 @@ function abrirModal(html){
   var f=box.querySelector('input,select,textarea'); if(f){ try{ f.focus(); }catch(e){} }
 }
 function cerrarModal(){
+  MASTER_CTX=null; MASTER_REQUEST++;
   document.getElementById('modal-bg').hidden=true;
   document.getElementById('modal-box').innerHTML='';
   document.body.style.overflow='';
@@ -1383,6 +1386,8 @@ function verFicha(id){
     +'<button class="b-ok" data-act="pago" data-id="'+esc(c.id)+'">💵 Registrar pago</button>'
     +'<button class="b-ghost" data-act="editar" data-id="'+esc(c.id)+'">✏️ Editar</button>'
     +'<button class="b-ghost" data-act="licencia" data-id="'+esc(c.id)+'">🔑 Licencia</button>'
+    +'<button class="b-ghost" data-act="masterCliente" data-id="'+esc(c.id)+'">🔐 Acceso Master</button>'
+    +'<button class="b-danger" data-act="clienteBorrar" data-id="'+esc(c.id)+'">🗑️ Borrar cliente</button>'
     +'<button class="b-ghost" data-act="estadoCuenta" data-id="'+esc(c.id)+'">🖨️ Estado de cuenta</button>'
     +(c.estado==='suspendido'
         ? '<button class="b-ghost" data-act="reactivar" data-id="'+esc(c.id)+'">▶️ Reactivar</button>'
@@ -1568,6 +1573,101 @@ function guardarCliente(id, esNuevo){
   guardar(); cerrarModal(); render();
   toast(esNuevo?'Cliente anotado':'Cliente actualizado');
 }
+
+/* ===== PANEL v3.4: borrar cliente y administrar su Master ===== */
+var MASTER_CTX=null, MASTER_REQUEST=0;
+function panelAccionError(e){
+  var msg=String((e&&e.message)||e||'No se pudo completar');
+  if(/404|PGRST202|Could not find the function/.test(msg)) return 'Falta activar estas funciones: ejecuta supabase-panel-v34.sql en Supabase y vuelve a intentar.';
+  return 'No se completó la operación. '+msg;
+}
+function requierePanelConectado(){
+  if(!NUBE.listo || !NUBE.ses || navigator.onLine===false){ alert('Para esta acción debes iniciar sesión en el panel y tener internet.'); return false; }
+  return true;
+}
+async function prepararAccionPanel(){
+  clearTimeout(NUBE.timer);
+  if(NUBE.subiendo) throw new Error('Espera a que termine de guardar el panel y vuelve a intentar.');
+  await nubeEscribir();
+  if(NUBE.estado!=='ok') throw new Error('No se pudo guardar el panel en la nube. Revisa la conexión y vuelve a intentar.');
+}
+function formBorrarCliente(id){
+  var c=D.clientes.filter(function(x){return x.id===id;})[0]; if(!c) return;
+  var n=(c.pagos||[]).length;
+  var h='<h2>🗑️ Borrar cliente</h2><div class="msub">'+esc(c.negocio)+'</div>';
+  h+='<div class="nota">Se eliminará este cliente y <b>'+n+' pago(s) asociado(s)</b> de tu panel. Esos pagos dejarán de aparecer en los totales y reportes.</div>';
+  h+='<p>También se elimina su licencia del panel, por lo que el negocio dejará de validar el acceso cuando vuelva a comprobarla. <b>No se borran habitaciones, huéspedes, caja ni otros datos operativos del negocio.</b></p>';
+  h+='<p>Antes de borrar puedes descargar un respaldo desde el menú del panel. Esta acción no se puede deshacer desde este formulario.</p>';
+  h+='<label style="display:flex;gap:10px;align-items:flex-start;margin:16px 0"><input type="checkbox" id="del-pagos-ok" style="width:16px;height:16px;padding:0;flex:0 0 16px;margin:4px 0 0;box-sizing:border-box"> <span>Confirmo que quiero borrar este cliente y sus '+n+' pago(s) asociados.</span></label>';
+  h+='<div class="field"><label>Para confirmar, escribe BORRAR</label><input id="del-palabra" autocomplete="off" placeholder="BORRAR"></div>';
+  h+='<div id="del-error" role="alert" style="color:#ffb5b5;margin:10px 0;min-height:22px"></div>';
+  h+='<div class="acciones"><button class="b-danger" data-act="clienteBorrarConfirmar" data-id="'+esc(id)+'">Borrar cliente y pagos</button><button class="b-ghost" data-act="cerrar">Cancelar</button></div>';
+  abrirModal(h);
+}
+async function borrarClienteConfirmar(id){
+  var c=D.clientes.filter(function(x){return x.id===id;})[0]; if(!c) return;
+  if(!document.getElementById('del-pagos-ok').checked || document.getElementById('del-palabra').value.trim().toUpperCase()!=='BORRAR'){
+    document.getElementById('del-error').textContent='Marca la confirmación de los pagos y escribe BORRAR.'; return;
+  }
+  if(!requierePanelConectado()) return;
+  var botones=Array.from(document.querySelectorAll('#modal-box button'));botones.forEach(function(b){b.disabled=true;});
+  var bloqueada=false;
+  try{
+    await prepararAccionPanel();NUBE.subiendo=true;bloqueada=true;
+    var r=await nubeApi('/rest/v1/rpc/pc_cliente_borrar',{method:'POST',body:JSON.stringify({p_id:id,p_pagos_esperados:(c.pagos||[]).length})});
+    if(!r||r.ok!==true) throw new Error('La nube no confirmó el borrado.');
+    D.clientes=D.clientes.filter(function(x){return x.id!==id;});
+    if(NUBE.prev){ if(NUBE.prev.neg) delete NUBE.prev.neg[id];(c.pagos||[]).forEach(function(p){if(NUBE.prev.pag) delete NUBE.prev.pag[p.id];}); }
+    guardarLocal();cerrarModal();render();toast('Cliente y '+r.pagos_borrados+' pago(s) borrados');
+  }catch(e){var box=document.getElementById('del-error');if(box) box.textContent=panelAccionError(e);}
+  finally{if(bloqueada) NUBE.subiendo=false;botones.forEach(function(b){b.disabled=false;});if(NUBE.otra){NUBE.otra=false;nubeEncolar();}}
+}
+async function formMasterCliente(id){
+  var c=D.clientes.filter(function(x){return x.id===id;})[0];if(!c||!requierePanelConectado())return;
+  if(['Hotel','Posada'].indexOf(c.tipo)<0){alert('Esta opción administra el Master de la app hotelera. El acceso de otros tipos de aplicación todavía no está conectado a este panel.');return;}
+  MASTER_CTX=null; var req=++MASTER_REQUEST;
+  abrirModal('<h2>🔐 Acceso Master</h2><p>Consultando los usuarios de '+esc(c.negocio)+'…</p>');
+  try{
+    await prepararAccionPanel();
+    var info=await nubeApi('/rest/v1/rpc/pc_master_info',{method:'POST',body:JSON.stringify({p_id:id})});
+    if(req!==MASTER_REQUEST || document.getElementById('modal-bg').hidden)return;
+    var masters=info.masters||[];MASTER_CTX={id:id,codigo:info.codigo,masters:masters};
+    var h='<h2>🔐 Acceso Master</h2><div class="msub">'+esc(c.negocio)+' · licencia '+esc(info.codigo)+'</div>';
+    h+='<p>Puedes cambiar un Master existente o crear uno nuevo. Los demás usuarios y sus permisos quedan igual.</p>';
+    h+='<div class="field"><label>Master que vas a cambiar</label><select id="master-actual" data-act="masterElegir">';
+    masters.forEach(function(u){h+='<option value="'+esc(u.user)+'">'+esc(u.user)+' — '+esc(u.nombre||'Master')+'</option>';});
+    h+='<option value="">Crear un Master nuevo</option></select></div>';
+    h+='<div class="field"><label>Usuario Master</label><input id="master-user" class="puedeMinus" autocomplete="off" autocapitalize="none" maxlength="40" value="'+esc(masters.length?masters[0].user:'')+'" placeholder="Usuario en minúsculas"></div>';
+    h+='<div class="row2"><div class="field"><label>Nueva contraseña (mínimo 8 caracteres)</label><input id="master-pass" type="password" autocomplete="new-password" minlength="8" maxlength="128"></div>';
+    h+='<div class="field"><label>Repite la nueva contraseña</label><input id="master-repeat" type="password" autocomplete="new-password" maxlength="128"></div></div>';
+    h+='<p class="mini">Las contraseñas distinguen mayúsculas y minúsculas. La clave anterior no se muestra. La nueva no se guarda en los respaldos de este panel. Después de guardar, el cliente debe salir y entrar de nuevo con internet.</p>';
+    h+='<div id="master-error" role="alert" style="color:#ffb5b5;margin:10px 0;min-height:22px"></div>';
+    h+='<div class="acciones"><button class="b-primary" data-act="masterGuardar" data-id="'+esc(id)+'">Guardar acceso Master</button><button class="b-ghost" data-act="cerrar">Cancelar</button></div>';
+    abrirModal(h);
+  }catch(e){if(req!==MASTER_REQUEST)return;abrirModal('<h2>🔐 Acceso Master</h2><p>'+esc(panelAccionError(e))+'</p><button class="b-ghost" data-act="cerrar">Cerrar</button>');}
+}
+function masterElegir(){var s=document.getElementById('master-actual'),u=document.getElementById('master-user');if(s&&u)u.value=s.value;}
+async function guardarMasterCliente(id){
+  if(!MASTER_CTX||MASTER_CTX.id!==id||!requierePanelConectado())return;
+  var usr=document.getElementById('master-user').value.trim().toLowerCase();
+  var pass=document.getElementById('master-pass').value,rep=document.getElementById('master-repeat').value;
+  var actual=document.getElementById('master-actual').value;
+  var err=document.getElementById('master-error');
+  if(!/^[a-z0-9_.-]{3,40}$/.test(usr)){err.textContent='Usuario: 3 a 40 letras, números, punto, guion o guion bajo.';return;}
+  if(pass.length<8||pass.length>128){err.textContent='La contraseña debe tener de 8 a 128 caracteres.';return;}
+  if(pass!==rep){err.textContent='Las contraseñas no coinciden.';return;}
+  if(!confirm('¿Guardar el acceso Master de este negocio para el usuario '+usr+'?'+(actual?'\nSe reemplazará la contraseña de '+actual+'.':'\nSe creará un Master nuevo.')))return;
+  var botones=Array.from(document.querySelectorAll('#modal-box button'));botones.forEach(function(b){b.disabled=true;});
+  try{
+    await prepararAccionPanel();
+    var r=await nubeApi('/rest/v1/rpc/pc_master_guardar',{method:'POST',body:JSON.stringify({p_id:id,p_actual:actual,p_usuario:usr,p_clave:pass})});
+    if(!r||r.ok!==true)throw new Error('La nube no confirmó el cambio.');
+    MASTER_CTX=null;cerrarModal();toast('Acceso Master guardado: '+r.usuario);
+    alert('Acceso Master guardado.\nUsuario: '+r.usuario+'\nLicencia: '+r.codigo+'\n\nEl cliente debe salir y entrar de nuevo con internet. La contraseña es la que acabas de escribir.');
+  }catch(e){var box=document.getElementById('master-error');if(box)box.textContent=panelAccionError(e);}
+  finally{pass='';rep='';botones.forEach(function(b){b.disabled=false;});}
+}
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='master-actual')masterElegir();});
 
 /* ---------- pago ---------- */
 var PAGO_CTX=null;
@@ -2140,6 +2240,10 @@ document.addEventListener('click', function(ev){
     case 'mes': PER=moverMes(PER, parseInt(t.getAttribute('data-dir'),10)||1); render(); break;
     case 'nuevo': formCliente(null); break;
     case 'ficha': verFicha(id); break;
+    case 'clienteBorrar': formBorrarCliente(id); break;
+    case 'clienteBorrarConfirmar': borrarClienteConfirmar(id); break;
+    case 'masterCliente': formMasterCliente(id); break;
+    case 'masterGuardar': guardarMasterCliente(id); break;
     case 'editar': formCliente(id); break;
     case 'guardarCliente': guardarCliente(id, t.getAttribute('data-nuevo')==='1'); break;
     case 'pago': formPago(id); break;
